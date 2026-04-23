@@ -1,0 +1,904 @@
+\documentclass[12pt,a4paper]{article}
+
+% ============================================================
+%  PACKAGES
+% ============================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{caption}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{pdfpages}
+\usepackage{tocloft}
+\usepackage{setspace}
+
+% ============================================================
+%  STYLING
+% ============================================================
+\definecolor{codegreen}{rgb}{0.0,0.5,0.0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.97,0.97,0.97}
+\definecolor{brandgreen}{HTML}{10B981}
+\definecolor{brandcyan}{HTML}{06B6D4}
+
+\lstdefinestyle{codestyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codepurple}\bfseries,
+    stringstyle=\color{codegray},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    numberstyle=\tiny\color{codegray},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    frame=single,
+    rulecolor=\color{codegray!30},
+}
+\lstset{style=codestyle}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=brandgreen,
+    urlcolor=brandcyan,
+    citecolor=codepurple,
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{TennisLytics --- Tennis Analytics Dashboard}}
+\fancyhead[R]{\small\thepage}
+\fancyfoot[C]{\small\textit{MERN Stack Project Report}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\titleformat{\section}{\Large\bfseries\color{brandgreen}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\large\bfseries\color{brandcyan}}{}{0em}{}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\onehalfspacing
+
+% ============================================================
+%  TITLE PAGE
+% ============================================================
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+
+    {\Huge\bfseries TennisLytics}\\[0.5cm]
+    {\LARGE\color{brandgreen} Tennis Analytics Dashboard}\\[1.5cm]
+
+    {\Large A Full-Stack MERN Application}\\[0.3cm]
+    {\large MongoDB $\cdot$ Express.js $\cdot$ React.js $\cdot$ Node.js}\\[3cm]
+
+    {\large\textbf{Project Report}}\\[0.5cm]
+    {\large Database Management Systems}\\[2cm]
+
+    \begin{tabular}{rl}
+        \textbf{Submitted by:} & \textit{[Your Name]} \\
+        \textbf{Roll No.:}     & \textit{[Your Roll Number]} \\
+        \textbf{Course:}       & \textit{[Course Name]} \\
+        \textbf{Semester:}     & \textit{[Semester]} \\
+        \textbf{Guided by:}    & \textit{[Faculty Name]} \\
+    \end{tabular}
+
+    \vfill
+    {\large\textit{[University / College Name]}}\\[0.3cm]
+    {\large April 2026}
+\end{titlepage}
+
+% ============================================================
+%  TABLE OF CONTENTS
+% ============================================================
+\newpage
+\tableofcontents
+\newpage
+
+% ============================================================
+%  1. INTRODUCTION
+% ============================================================
+\section{Introduction}
+
+\subsection{Project Overview}
+\textbf{TennisLytics} is a full-stack web-based Tennis Analytics Dashboard built using the \textbf{MERN stack} (MongoDB, Express.js, React.js, Node.js). The application provides a comprehensive platform for exploring, analyzing, and visualizing professional tennis match data sourced from the ATP (Association of Tennis Professionals) tour.
+
+The system ingests real-world ATP match data from CSV files, stores it in a normalized MongoDB database with two primary collections (\texttt{Players} and \texttt{Matches}), and exposes a rich RESTful API powered by Express.js. The React-based frontend delivers an interactive, responsive single-page application (SPA) with data visualizations using \textbf{Recharts}, a modern charting library.
+
+\subsection{Motivation}
+Tennis generates vast amounts of structured data --- player rankings, match scores, surface preferences, head-to-head records, and set-by-set breakdowns. Existing platforms present this data in static tables with limited interactivity. TennisLytics addresses this gap by offering:
+
+\begin{itemize}[noitemsep]
+    \item Interactive player search with \textbf{real-time filtering}
+    \item Surface-wise win-percentage analytics using \textbf{MongoDB aggregation pipelines}
+    \item Head-to-head comparison with \textbf{searchable dropdowns}
+    \item Match exploration by type (tiebreakers, sweeps, close sets, dominant wins)
+    \item Rivalry detection using \textbf{advanced aggregation} ($\$$addFields, $\$$cond, $\$$group)
+    \item Tournament and player demographic analytics
+\end{itemize}
+
+\subsection{Scope}
+The project demonstrates proficiency in:
+\begin{enumerate}[noitemsep]
+    \item \textbf{Database Design}: Normalized schemas with embedded documents and ObjectId references
+    \item \textbf{MongoDB Query Mastery}: 20+ distinct query operators and aggregation stages
+    \item \textbf{REST API Architecture}: 31 API endpoints across two route modules
+    \item \textbf{Frontend Engineering}: Component-based React architecture with client-side routing
+    \item \textbf{Data Visualization}: Interactive charts (PieChart, BarChart) with Recharts
+    \item \textbf{Deployment Readiness}: Architecture designed for Vercel (frontend) + MongoDB Atlas (database)
+\end{enumerate}
+
+
+% ============================================================
+%  2. PROBLEM STATEMENT
+% ============================================================
+\newpage
+\section{Problem Statement}
+
+\subsection{Background}
+The ATP tour generates over 3,000 professional matches annually across multiple surfaces (Hard, Clay, Grass), tournament tiers (Grand Slams, Masters, Challengers), and rounds. This data, while publicly available in raw CSV formats, is difficult to explore without specialized tools.
+
+\subsection{Problem Definition}
+Design and implement a \textbf{full-stack web application} that:
+
+\begin{enumerate}
+    \item \textbf{Ingests} raw ATP match data from CSV files into a MongoDB database with properly normalized schemas (Player and Match collections with ObjectId references).
+
+    \item \textbf{Exposes} a comprehensive RESTful API that demonstrates mastery of MongoDB query operations, including:
+    \begin{itemize}[noitemsep]
+        \item Basic CRUD operations (\texttt{find}, \texttt{create}, \texttt{update}, \texttt{delete})
+        \item Query operators (\texttt{\$regex}, \texttt{\$or}, \texttt{\$ne}, \texttt{\$gte}, \texttt{\$lte}, \texttt{\$in})
+        \item Array query operators (\texttt{\$elemMatch}, \texttt{\$exists}, \texttt{\$not}, \texttt{\$all})
+        \item Aggregation pipeline stages (\texttt{\$match}, \texttt{\$group}, \texttt{\$sort}, \texttt{\$limit}, \texttt{\$lookup}, \texttt{\$unwind}, \texttt{\$project}, \texttt{\$addFields}, \texttt{\$facet}, \texttt{\$cond}, \texttt{\$size}, \texttt{\$filter}, \texttt{\$concat}, \texttt{\$toString}, \texttt{\$slice}, \texttt{\$addToSet}, \texttt{\$push})
+        \item Utility methods (\texttt{countDocuments}, \texttt{distinct}, \texttt{populate}, \texttt{lean})
+    \end{itemize}
+
+    \item \textbf{Renders} an interactive, responsive frontend with:
+    \begin{itemize}[noitemsep]
+        \item Sortable and filterable player dashboard
+        \item Player detail pages with surface-wise analytics and PieCharts
+        \item Searchable head-to-head comparison tool
+        \item Tournament analytics with BarCharts
+        \item Match explorer with 6 query-based filters
+        \item Player demographic insights (hand distribution, country breakdown)
+        \item Top rivalries leaderboard
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Objectives}
+\begin{enumerate}[noitemsep]
+    \item Parse and seed 11,190 match records involving 1,477 players from ATP CSV data
+    \item Implement 31 REST API endpoints showcasing diverse MongoDB query patterns
+    \item Build 8 distinct frontend views with data visualizations
+    \item Ensure deployment readiness for Vercel (frontend) and MongoDB Atlas (backend)
+\end{enumerate}
+
+
+% ============================================================
+%  3. SPECIFIC REQUIREMENTS
+% ============================================================
+\newpage
+\section{Specific Requirements}
+
+\subsection{Functional Requirements}
+
+\begin{longtable}{|c|p{3.5cm}|p{7cm}|}
+    \hline
+    \textbf{ID} & \textbf{Requirement} & \textbf{Description} \\
+    \hline
+    \endhead
+    FR-01 & Player Management & Add, view, update, and delete player records (full CRUD) \\
+    \hline
+    FR-02 & Player Search & Search players by name or nationality using regex-based pattern matching \\
+    \hline
+    FR-03 & Player Sorting & Sort player table by rank, name, nationality, or hand (ascending/descending) \\
+    \hline
+    FR-04 & Player Filtering & Filter players by hand preference (R/L/U) and nationality (country code) \\
+    \hline
+    FR-05 & Ranked Toggle & Toggle to show only ranked players, pushing null-ranked players to the bottom \\
+    \hline
+    FR-06 & Surface Win Stats & Display per-surface win percentage for any selected player using aggregation \\
+    \hline
+    FR-07 & Match History & View a player's recent matches with result, opponent, score, and surface \\
+    \hline
+    FR-08 & Head-to-Head & Compare two players with searchable dropdowns, showing win count and match list \\
+    \hline
+    FR-09 & Match Explorer & Filter matches by type: sweeps, tiebreakers, close sets, three-setters, straight sets, dominant wins \\
+    \hline
+    FR-10 & Tournament Stats & View tournaments ranked by match count with surface and BarChart visualization \\
+    \hline
+    FR-11 & Top Winners & Leaderboard of players with most wins, filterable by surface \\
+    \hline
+    FR-12 & Rivalry Detection & Identify player pairs who played the most matches against each other \\
+    \hline
+    FR-13 & Player Insights & Demographics: hand distribution (PieChart), top countries (BarChart), left-handed players, rank range finder \\
+    \hline
+    FR-14 & Overview Stats & Dashboard cards showing total matches, tiebreakers, sweeps, and surface breakdown \\
+    \hline
+    FR-15 & Data Seeding & Ingest ATP match data from CSV with score parsing, upsert logic, and batch processing \\
+    \hline
+\end{longtable}
+
+\subsection{Non-Functional Requirements}
+
+\begin{longtable}{|c|p{3cm}|p{7.5cm}|}
+    \hline
+    \textbf{ID} & \textbf{Requirement} & \textbf{Description} \\
+    \hline
+    \endhead
+    NFR-01 & Performance & API response times under 500ms for standard queries; aggregation pipelines under 2s \\
+    \hline
+    NFR-02 & Responsiveness & Frontend adapts to desktop, tablet, and mobile viewports \\
+    \hline
+    NFR-03 & Usability & Glassmorphism dark theme with smooth animations and micro-interactions \\
+    \hline
+    NFR-04 & Scalability & Stateless REST API architecture; database can be scaled via MongoDB Atlas \\
+    \hline
+    NFR-05 & Deployability & Frontend deployable on Vercel; backend deployable on any Node.js host; database on MongoDB Atlas \\
+    \hline
+    NFR-06 & Maintainability & Modular codebase with separated routes, models, components, and pages \\
+    \hline
+\end{longtable}
+
+
+% ============================================================
+%  4. CONTEXT LEVEL DIAGRAM AND DATA FLOW DIAGRAM
+% ============================================================
+\newpage
+\section{Context Level Diagram and Data Flow Diagram}
+
+This section presents the system's architectural diagrams. PlantUML source code for all diagrams is provided in the accompanying \texttt{diagrams.puml} file.
+
+\subsection{Context Level Diagram (Level 0 DFD)}
+
+The context diagram shows the system boundary with external entities (User, MongoDB Atlas, CSV Data Source).
+
+\begin{center}
+    \fbox{\parbox{0.85\textwidth}{
+        \centering
+        \vspace{2cm}
+        \textit{[Insert Context Level Diagram here]}\\
+        \textit{Generated from: diagrams.puml --- @startuml context\_diagram}
+        \vspace{2cm}
+    }}
+    \captionof{figure}{Context Level Diagram (Level 0 DFD)}
+\end{center}
+
+\subsection{Level 1 Data Flow Diagram}
+
+The Level 1 DFD decomposes the system into its major processes: Player Management, Match Analytics, Visualization Engine, and Data Seeding.
+
+\begin{center}
+    \fbox{\parbox{0.85\textwidth}{
+        \centering
+        \vspace{3cm}
+        \textit{[Insert Level 1 DFD here]}\\
+        \textit{Generated from: diagrams.puml --- @startuml level1\_dfd}
+        \vspace{3cm}
+    }}
+    \captionof{figure}{Level 1 Data Flow Diagram}
+\end{center}
+
+\subsection{Use Case Diagram}
+
+\begin{center}
+    \fbox{\parbox{0.85\textwidth}{
+        \centering
+        \vspace{3cm}
+        \textit{[Insert Use Case Diagram here]}\\
+        \textit{Generated from: diagrams.puml --- @startuml use\_case}
+        \vspace{3cm}
+    }}
+    \captionof{figure}{Use Case Diagram}
+\end{center}
+
+\subsection{Entity Relationship Diagram}
+
+\begin{center}
+    \fbox{\parbox{0.85\textwidth}{
+        \centering
+        \vspace{3cm}
+        \textit{[Insert ER Diagram here]}\\
+        \textit{Generated from: diagrams.puml --- @startuml er\_diagram}
+        \vspace{3cm}
+    }}
+    \captionof{figure}{Entity-Relationship Diagram}
+\end{center}
+
+
+% ============================================================
+%  ADDITIONAL UML DIAGRAMS
+% ============================================================
+\newpage
+\subsection{Component Diagram}
+
+\begin{center}
+    \fbox{\parbox{0.85\textwidth}{
+        \centering
+        \vspace{3cm}
+        \textit{[Insert Component Diagram here]}\\
+        \textit{Generated from: diagrams.puml --- @startuml component\_diagram}
+        \vspace{3cm}
+    }}
+    \captionof{figure}{System Component Diagram}
+\end{center}
+
+\subsection{Sequence Diagram --- Head-to-Head Flow}
+
+\begin{center}
+    \fbox{\parbox{0.85\textwidth}{
+        \centering
+        \vspace{3cm}
+        \textit{[Insert Sequence Diagram here]}\\
+        \textit{Generated from: diagrams.puml --- @startuml sequence\_h2h}
+        \vspace{3cm}
+    }}
+    \captionof{figure}{Sequence Diagram: Head-to-Head Comparison Flow}
+\end{center}
+
+\subsection{Activity Diagram --- Match Explorer}
+
+\begin{center}
+    \fbox{\parbox{0.85\textwidth}{
+        \centering
+        \vspace{3cm}
+        \textit{[Insert Activity Diagram here]}\\
+        \textit{Generated from: diagrams.puml --- @startuml activity\_explorer}
+        \vspace{3cm}
+    }}
+    \captionof{figure}{Activity Diagram: Match Explorer Workflow}
+\end{center}
+
+\subsection{Class Diagram --- Mongoose Models}
+
+\begin{center}
+    \fbox{\parbox{0.85\textwidth}{
+        \centering
+        \vspace{3cm}
+        \textit{[Insert Class Diagram here]}\\
+        \textit{Generated from: diagrams.puml --- @startuml class\_diagram}
+        \vspace{3cm}
+    }}
+    \captionof{figure}{Class Diagram: Mongoose Models}
+\end{center}
+
+\subsection{Deployment Diagram}
+
+\begin{center}
+    \fbox{\parbox{0.85\textwidth}{
+        \centering
+        \vspace{3cm}
+        \textit{[Insert Deployment Diagram here]}\\
+        \textit{Generated from: diagrams.puml --- @startuml deployment\_diagram}
+        \vspace{3cm}
+    }}
+    \captionof{figure}{Deployment Diagram (Vercel + MongoDB Atlas)}
+\end{center}
+
+
+% ============================================================
+%  5. SYSTEM SPECIFICATION
+% ============================================================
+\newpage
+\section{System Specification}
+
+\subsection{Hardware Requirements}
+
+\begin{tabular}{|l|l|}
+    \hline
+    \textbf{Component}   & \textbf{Minimum Specification} \\
+    \hline
+    Processor            & Intel Core i3 / Apple M1 or equivalent \\
+    \hline
+    RAM                  & 4 GB (8 GB recommended) \\
+    \hline
+    Storage              & 500 MB free disk space \\
+    \hline
+    Network              & Internet connection (for MongoDB Atlas) \\
+    \hline
+    Display              & 1280$\times$720 minimum resolution \\
+    \hline
+\end{tabular}
+
+\subsection{Software Requirements}
+
+\begin{tabular}{|l|l|}
+    \hline
+    \textbf{Software}      & \textbf{Version} \\
+    \hline
+    Operating System        & Windows 10+ / macOS 12+ / Linux (Ubuntu 20.04+) \\
+    \hline
+    Node.js                 & v18.0.0 or higher \\
+    \hline
+    npm                     & v9.0.0 or higher \\
+    \hline
+    MongoDB                 & v6.0+ (local) or MongoDB Atlas (cloud) \\
+    \hline
+    Web Browser             & Chrome 90+ / Firefox 90+ / Edge 90+ \\
+    \hline
+    Git                     & v2.30+ \\
+    \hline
+\end{tabular}
+
+\subsection{Database Specification}
+
+\begin{tabular}{|l|l|}
+    \hline
+    \textbf{Parameter}           & \textbf{Value} \\
+    \hline
+    Database Engine              & MongoDB v6.0+ \\
+    \hline
+    Database Name                & \texttt{tennis\_analytics} \\
+    \hline
+    Collections                  & \texttt{players} (1,477 docs), \texttt{matches} (11,190 docs) \\
+    \hline
+    Total Documents              & 12,667 \\
+    \hline
+    Data Source                  & ATP Tour 2024 CSV (Challenger + Main Draw) \\
+    \hline
+    Schema Type                  & Hybrid (embedded arrays + references) \\
+    \hline
+\end{tabular}
+
+\subsection{MongoDB Schema Design}
+
+\subsubsection{Player Collection}
+\begin{lstlisting}[language=JavaScript, caption={Player Schema (Mongoose)}]
+const playerSchema = new mongoose.Schema({
+    name:        { type: String, required: true },
+    nationality: { type: String, required: true },
+    rank:        { type: Number },
+    hand:        { type: String, enum: ['R', 'L', 'U'], default: 'R' },
+}, { timestamps: true });
+\end{lstlisting}
+
+\subsubsection{Match Collection (with Embedded Sets)}
+\begin{lstlisting}[language=JavaScript, caption={Match Schema with Embedded Set Sub-document}]
+const setSchema = new mongoose.Schema({
+    setNum:      { type: Number, required: true },
+    winnerScore: { type: Number, required: true },
+    loserScore:  { type: Number, required: true },
+    tiebreak:    { type: Boolean, default: false },
+}, { _id: false });
+
+const matchSchema = new mongoose.Schema({
+    tourney_name: { type: String, required: true },
+    surface:      { type: String, required: true },
+    winner_id:    { type: ObjectId, ref: 'Player', required: true },
+    loser_id:     { type: ObjectId, ref: 'Player', required: true },
+    sets:         [setSchema],      // Embedded array of sub-documents
+}, { timestamps: true });
+\end{lstlisting}
+
+
+% ============================================================
+%  6. TOOLS USED
+% ============================================================
+\newpage
+\section{Tools Used}
+
+\subsection{Backend Stack}
+
+\begin{tabular}{|l|l|p{5.5cm}|}
+    \hline
+    \textbf{Tool} & \textbf{Version} & \textbf{Purpose} \\
+    \hline
+    Node.js & v18+ & JavaScript runtime for server-side execution \\
+    \hline
+    Express.js & v4.21 & Minimal web framework for REST API routing \\
+    \hline
+    Mongoose & v8.12 & MongoDB ODM for schema definitions and queries \\
+    \hline
+    MongoDB & v6.0+ & NoSQL document database engine \\
+    \hline
+    dotenv & v16.4 & Environment variable configuration management \\
+    \hline
+    csv-parser & v3.0 & Stream-based CSV parsing for data seeding \\
+    \hline
+    cors & v2.8 & Cross-Origin Resource Sharing middleware \\
+    \hline
+\end{tabular}
+
+\subsection{Frontend Stack}
+
+\begin{tabular}{|l|l|p{5.5cm}|}
+    \hline
+    \textbf{Tool} & \textbf{Version} & \textbf{Purpose} \\
+    \hline
+    React & v19 & Component-based UI library (SPA framework) \\
+    \hline
+    Vite & v8.0 & Next-generation frontend build tool and dev server \\
+    \hline
+    Tailwind CSS & v4 & Utility-first CSS framework for styling \\
+    \hline
+    Recharts & v2.15 & React charting library (PieChart, BarChart) \\
+    \hline
+    React Router & v7.5 & Client-side routing for SPA navigation \\
+    \hline
+    Axios & v1.8 & Promise-based HTTP client for API communication \\
+    \hline
+\end{tabular}
+
+\subsection{Development \& Deployment Tools}
+
+\begin{tabular}{|l|p{7cm}|}
+    \hline
+    \textbf{Tool} & \textbf{Purpose} \\
+    \hline
+    Git / GitHub & Version control and remote repository hosting \\
+    \hline
+    VS Code & Primary code editor with JavaScript/React extensions \\
+    \hline
+    Vercel & Frontend deployment platform (planned) \\
+    \hline
+    MongoDB Atlas & Cloud-hosted MongoDB service (planned) \\
+    \hline
+    Postman / curl & API endpoint testing during development \\
+    \hline
+\end{tabular}
+
+
+% ============================================================
+%  7. SAMPLE SCREENSHOTS
+% ============================================================
+\newpage
+\section{Sample Screenshots}
+
+This section presents screenshots from the running application. The frontend runs on \texttt{http://localhost:5173} during development with hot module replacement via Vite.
+
+\subsection{Player Dashboard}
+The main dashboard displays all ranked players in a sortable table with filter controls for hand preference, nationality, and a ``Ranked Only'' toggle. Overview stats cards at the top show total matches, tiebreakers, sweeps, and surface distribution.
+
+\begin{center}
+    \fbox{\parbox{0.85\textwidth}{
+        \centering
+        \vspace{4cm}
+        \textit{[Insert Dashboard Screenshot]}
+        \vspace{4cm}
+    }}
+    \captionof{figure}{Player Dashboard with Stats Cards and Sortable Table}
+\end{center}
+
+\subsection{Player Detail Page}
+Shows a selected player's profile with overall win rate, total wins/matches, a surface win-percentage PieChart, surface breakdown progress bars, and recent match history table.
+
+\begin{center}
+    \fbox{\parbox{0.85\textwidth}{
+        \centering
+        \vspace{4cm}
+        \textit{[Insert Player Detail Screenshot]}
+        \vspace{4cm}
+    }}
+    \captionof{figure}{Player Detail View with Surface Analytics}
+\end{center}
+
+\subsection{Head-to-Head Comparison}
+Users search for two players using searchable dropdown components. The result displays win counts for each player, total matches, and a chronological match history with scores and surface badges.
+
+\begin{center}
+    \fbox{\parbox{0.85\textwidth}{
+        \centering
+        \vspace{4cm}
+        \textit{[Insert H2H Screenshot]}
+        \vspace{4cm}
+    }}
+    \captionof{figure}{Head-to-Head Comparison with Searchable Dropdowns}
+\end{center}
+
+\newpage
+
+\subsection{Tournament Analytics}
+Displays surface distribution cards, a horizontal BarChart of top tournaments by match count, a filterable top winners leaderboard, and a complete tournament table.
+
+\begin{center}
+    \fbox{\parbox{0.85\textwidth}{
+        \centering
+        \vspace{4cm}
+        \textit{[Insert Tournament Analytics Screenshot]}
+        \vspace{4cm}
+    }}
+    \captionof{figure}{Tournament Analytics with BarChart and Leaderboard}
+\end{center}
+
+\subsection{Top Rivalries}
+Identifies player pairs who played the most matches against each other. Each rivalry card shows total match count, per-player win breakdown with a stacked progress bar, surfaces, and tournament count.
+
+\begin{center}
+    \fbox{\parbox{0.85\textwidth}{
+        \centering
+        \vspace{4cm}
+        \textit{[Insert Rivalries Screenshot]}
+        \vspace{4cm}
+    }}
+    \captionof{figure}{Top Rivalries with Win Breakdown Bars}
+\end{center}
+
+\subsection{Match Explorer}
+Six filter buttons let users explore matches by query type: 6-0 Sweeps (\texttt{\$elemMatch}), Tiebreakers, Close Sets (7-5), Three-Setters (\texttt{\$expr + \$size}), Straight Sets, and Dominant Wins (\texttt{\$not + \$elemMatch}). Each filter displays the MongoDB query used.
+
+\begin{center}
+    \fbox{\parbox{0.85\textwidth}{
+        \centering
+        \vspace{4cm}
+        \textit{[Insert Match Explorer Screenshot]}
+        \vspace{4cm}
+    }}
+    \captionof{figure}{Match Explorer with Query-Based Filters}
+\end{center}
+
+\subsection{Player Insights}
+Demographics page showing hand distribution PieChart, top countries BarChart, a left-handed players list, and an interactive rank range finder with \texttt{\$gte}/\texttt{\$lte} sliders.
+
+\begin{center}
+    \fbox{\parbox{0.85\textwidth}{
+        \centering
+        \vspace{4cm}
+        \textit{[Insert Player Insights Screenshot]}
+        \vspace{4cm}
+    }}
+    \captionof{figure}{Player Insights with Demographics Charts}
+\end{center}
+
+
+% ============================================================
+%  8. OUTPUT REPORTS
+% ============================================================
+\newpage
+\section{Output Reports}
+
+\subsection{API Endpoint Summary}
+
+The application exposes \textbf{31 API endpoints} across two route modules. The table below catalogs each endpoint with the primary MongoDB operation it demonstrates.
+
+\subsubsection{Player Routes (\texttt{/api/players})}
+
+\begin{longtable}{|p{4.5cm}|l|p{5cm}|}
+    \hline
+    \textbf{Endpoint} & \textbf{Method} & \textbf{MongoDB Operation} \\
+    \hline
+    \endhead
+    \texttt{/} & GET & \texttt{aggregate} (\$addFields, \$cond, \$match, \$sort, \$project) \\
+    \hline
+    \texttt{/search?q=} & GET & \texttt{find} with \texttt{\$regex} + \texttt{\$options: 'i'} \\
+    \hline
+    \texttt{/nationalities} & GET & \texttt{distinct('nationality')} \\
+    \hline
+    \texttt{/count} & GET & \texttt{countDocuments()} \\
+    \hline
+    \texttt{/by-nationality} & GET & \texttt{aggregate} (\$group, \$push, \$sort, \$project, \$slice) \\
+    \hline
+    \texttt{/hand-stats} & GET & \texttt{aggregate} (\$group by hand, \$sort) \\
+    \hline
+    \texttt{/top-countries} & GET & \texttt{aggregate} (\$group, \$sort, \$limit) \\
+    \hline
+    \texttt{/left-handed} & GET & \texttt{find(\{ hand: 'L' \})} \\
+    \hline
+    \texttt{/rank-range} & GET & \texttt{find} with \texttt{\$gte} and \texttt{\$lte} \\
+    \hline
+    \texttt{/} & POST & \texttt{create()} \\
+    \hline
+    \texttt{/:id} & GET & \texttt{findById()} \\
+    \hline
+    \texttt{/:id} & PUT & \texttt{findByIdAndUpdate()} \\
+    \hline
+    \texttt{/:id} & DELETE & \texttt{findByIdAndDelete()} \\
+    \hline
+    \texttt{/:id/stats} & GET & \texttt{aggregate} (\$match, \$group, \$or) \\
+    \hline
+    \texttt{/:id/matches} & GET & \texttt{find} with \texttt{\$or} + \texttt{populate} \\
+    \hline
+\end{longtable}
+
+\subsubsection{Match Routes (\texttt{/api/matches})}
+
+\begin{longtable}{|p{4.5cm}|l|p{5cm}|}
+    \hline
+    \textbf{Endpoint} & \textbf{Method} & \textbf{MongoDB Operation} \\
+    \hline
+    \endhead
+    \texttt{/head-to-head} & GET & \texttt{aggregate} (\$match, \$or, \$lookup, \$unwind, \$project) \\
+    \hline
+    \texttt{/sweeps} & GET & \texttt{find} with \texttt{\$elemMatch} (6-0 sets) \\
+    \hline
+    \texttt{/tiebreakers} & GET & \texttt{find} with \texttt{\$elemMatch} (tiebreak: true) \\
+    \hline
+    \texttt{/count} & GET & \texttt{countDocuments()} \\
+    \hline
+    \texttt{/surface-stats} & GET & \texttt{aggregate} (\$group, \$sort, \$project) \\
+    \hline
+    \texttt{/tournament-stats} & GET & \texttt{aggregate} (\$group, \$addToSet, \$sort, \$limit) \\
+    \hline
+    \texttt{/top-winners} & GET & \texttt{aggregate} (\$group, \$sort, \$lookup, \$addFields, \$size) \\
+    \hline
+    \texttt{/overview} & GET & \texttt{aggregate} with \texttt{\$facet} (6 parallel pipelines) \\
+    \hline
+    \texttt{/by-surface/:s} & GET & \texttt{find} with field match + \texttt{countDocuments} \\
+    \hline
+    \texttt{/by-tournament/:n} & GET & \texttt{find} with \texttt{\$regex} \\
+    \hline
+    \texttt{/straights} & GET & \texttt{find} with \texttt{\$expr} + \texttt{\$size} \\
+    \hline
+    \texttt{/close-sets} & GET & \texttt{find} with \texttt{\$elemMatch} (7-5 sets) \\
+    \hline
+    \texttt{/three-setters} & GET & \texttt{find} with \texttt{\$expr} + \texttt{\$size} (3 sets) \\
+    \hline
+    \texttt{/dominant-wins} & GET & \texttt{find} with \texttt{\$not} + \texttt{\$elemMatch} + \texttt{\$exists} \\
+    \hline
+    \texttt{/filter} & GET & \texttt{find} with \texttt{\$and} (surface + tournament \$regex) \\
+    \hline
+    \texttt{/top-rivalries} & GET & \texttt{aggregate} (\$addFields, \$cond, \$toString, \$concat, \$group, \$sort, \$lookup, \$unwind, \$filter, \$size, \$project) \\
+    \hline
+\end{longtable}
+
+\subsection{MongoDB Query Operators Used}
+
+The following table summarizes all \textbf{25+ distinct MongoDB operators/features} demonstrated in the project:
+
+\begin{longtable}{|l|l|p{5cm}|}
+    \hline
+    \textbf{Category} & \textbf{Operator/Feature} & \textbf{Used In} \\
+    \hline
+    \endhead
+    CRUD        & \texttt{find, create, findById}         & Player CRUD \\
+    \hline
+    CRUD        & \texttt{findByIdAndUpdate}               & Player update \\
+    \hline
+    CRUD        & \texttt{findByIdAndDelete}               & Player delete \\
+    \hline
+    Query       & \texttt{\$regex, \$options}               & Search, Tournament filter \\
+    \hline
+    Query       & \texttt{\$or}                            & H2H, Player matches \\
+    \hline
+    Query       & \texttt{\$ne}                            & Ranked-only filter \\
+    \hline
+    Query       & \texttt{\$gte, \$lte}                     & Rank range finder \\
+    \hline
+    Query       & \texttt{\$gt}                            & Dominant wins \\
+    \hline
+    Array       & \texttt{\$elemMatch}                     & Sweeps, Tiebreakers, Close sets \\
+    \hline
+    Array       & \texttt{\$not + \$elemMatch}              & Dominant wins \\
+    \hline
+    Array       & \texttt{\$exists}                        & Dominant wins (sets.0) \\
+    \hline
+    Expression  & \texttt{\$expr + \$size}                  & Straight sets, Three-setters \\
+    \hline
+    Aggregation & \texttt{\$match}                         & All aggregation pipelines \\
+    \hline
+    Aggregation & \texttt{\$group + \$sum}                  & Surface stats, Countries \\
+    \hline
+    Aggregation & \texttt{\$sort}                          & All leaderboards \\
+    \hline
+    Aggregation & \texttt{\$limit}                         & Top-N queries \\
+    \hline
+    Aggregation & \texttt{\$lookup + \$unwind}              & H2H, Top winners, Rivalries \\
+    \hline
+    Aggregation & \texttt{\$project}                       & Clean output shaping \\
+    \hline
+    Aggregation & \texttt{\$addFields + \$cond}             & Null rank sorting, Rivalries \\
+    \hline
+    Aggregation & \texttt{\$facet}                         & Overview (6 parallel pipelines) \\
+    \hline
+    Aggregation & \texttt{\$addToSet}                      & Tournament surfaces \\
+    \hline
+    Aggregation & \texttt{\$push}                          & Nationality players list \\
+    \hline
+    Aggregation & \texttt{\$slice}                         & Top players per country \\
+    \hline
+    Aggregation & \texttt{\$filter}                        & Rivalry win count \\
+    \hline
+    Aggregation & \texttt{\$toString + \$concat}            & Pair key generation \\
+    \hline
+    Utility     & \texttt{countDocuments}                   & Total counts \\
+    \hline
+    Utility     & \texttt{distinct}                        & Nationalities list \\
+    \hline
+    Utility     & \texttt{populate}                        & Reference joins \\
+    \hline
+    Utility     & \texttt{lean}                            & Performance optimization \\
+    \hline
+\end{longtable}
+
+\subsection{Database Statistics}
+
+\begin{tabular}{|l|r|}
+    \hline
+    \textbf{Metric}              & \textbf{Value} \\
+    \hline
+    Total Players                & 1,477 \\
+    \hline
+    Total Matches                & 11,190 \\
+    \hline
+    Hard Court Matches           & 5,513 \\
+    \hline
+    Clay Court Matches           & 5,334 \\
+    \hline
+    Grass Court Matches          & 343 \\
+    \hline
+    Tiebreaker Matches           & varies \\
+    \hline
+    6-0 Sweep Matches            & varies \\
+    \hline
+    Right-Handed Players         & 1,049 \\
+    \hline
+    Left-Handed Players          & 161 \\
+    \hline
+    Countries Represented        & 90+ \\
+    \hline
+    Top Country (by player count)& USA (145) \\
+    \hline
+\end{tabular}
+
+
+% ============================================================
+%  9. CONCLUSION
+% ============================================================
+\newpage
+\section{Conclusion}
+
+\subsection{Summary}
+The \textbf{TennisLytics} project successfully demonstrates a production-grade full-stack web application built on the MERN stack. The key accomplishments include:
+
+\begin{enumerate}
+    \item \textbf{Database Design}: Two Mongoose schemas (Player and Match) with embedded sub-documents (sets array with tiebreak tracking) and ObjectId cross-references, showcasing both embedding and referencing patterns in MongoDB.
+
+    \item \textbf{Comprehensive MongoDB Usage}: 31 API endpoints exercising \textbf{25+ distinct MongoDB operators}, spanning basic CRUD, query operators (\texttt{\$regex}, \texttt{\$or}, \texttt{\$ne}, \texttt{\$gte}, \texttt{\$lte}), array operators (\texttt{\$elemMatch}, \texttt{\$not}, \texttt{\$exists}), expression operators (\texttt{\$expr}, \texttt{\$size}), and advanced aggregation stages (\texttt{\$facet}, \texttt{\$lookup}, \texttt{\$addFields}, \texttt{\$cond}, \texttt{\$filter}, \texttt{\$concat}).
+
+    \item \textbf{Data Pipeline}: A robust seed script that parses raw ATP CSV data (11,190 rows), normalizes tennis score strings (handling tiebreaks, retirements, walkovers), and performs batch upserts into MongoDB.
+
+    \item \textbf{Frontend}: 8 interactive views with data visualizations (PieCharts, BarCharts), searchable components, sortable tables, and a premium dark-mode design system with glassmorphism and micro-animations.
+
+    \item \textbf{Feature Depth}: Player management (CRUD), surface analytics, head-to-head comparison, tournament leaderboards, match explorer (6 filter types), rivalry detection, and player demographic insights.
+\end{enumerate}
+
+\subsection{Future Enhancements}
+
+\begin{enumerate}[noitemsep]
+    \item \textbf{Deployment}: Deploy frontend on Vercel, backend on Render/Railway, and migrate MongoDB to Atlas.
+    \item \textbf{Authentication}: Add JWT-based user authentication for personalized dashboards.
+    \item \textbf{Real-Time Data}: Integrate live ATP API feeds for automatic data updates.
+    \item \textbf{Advanced Analytics}: Add Elo rating calculations, win prediction models using match statistics (aces, break points, serve percentages).
+    \item \textbf{Indexing}: Create compound indexes on frequently queried fields (\texttt{winner\_id}, \texttt{loser\_id}, \texttt{surface}) for aggregation performance.
+    \item \textbf{Testing}: Add unit tests (Jest) for API endpoints and integration tests (Cypress) for frontend workflows.
+    \item \textbf{Mobile App}: Extend to React Native for iOS/Android companion apps.
+\end{enumerate}
+
+\subsection{Learning Outcomes}
+This project provided hands-on experience with:
+\begin{itemize}[noitemsep]
+    \item Designing normalized vs. embedded MongoDB schemas for real-world data
+    \item Writing complex aggregation pipelines with 10+ stages
+    \item Building RESTful APIs with proper route ordering and error handling
+    \item Creating responsive React SPAs with component composition and client-side routing
+    \item Implementing searchable dropdown components with keyboard navigation
+    \item Data seeding from CSV with robust string parsing
+\end{itemize}
+
+\vspace{1cm}
+\begin{center}
+    \rule{0.5\textwidth}{0.4pt}\\[0.5cm]
+    \textit{End of Report}
+\end{center}
+
+\end{document}

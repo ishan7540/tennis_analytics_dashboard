@@ -1,0 +1,515 @@
+' ============================================================
+'  TennisLytics - PlantUML Diagrams
+'  Generate each diagram separately using:
+'    java -jar plantuml.jar -tpng diagrams.puml
+'  Or paste into https://www.plantuml.com/plantuml/uml
+' ============================================================
+
+
+' ============================================================
+'  1. CONTEXT LEVEL DIAGRAM (Level 0 DFD)
+' ============================================================
+@startuml context_diagram
+
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Inter
+skinparam ArrowColor #10B981
+skinparam RectangleBorderColor #334155
+skinparam RectangleBackgroundColor #F1F5F9
+
+rectangle "User\n(Browser)" as User #E0F2FE
+rectangle "Admin\n(Data Manager)" as Admin #FEF3C7
+
+package "TennisLytics System" as System #E8FFF5 {
+    rectangle "Tennis Analytics\nDashboard" as App #10B981
+}
+
+database "MongoDB\n(Atlas / Local)" as DB #F1F5F9
+file "ATP CSV\nData Source" as CSV #FEF3C7
+
+User --> App : HTTP Requests\n(Browse, Search,\nFilter, Compare)
+App --> User : JSON Responses\n(Players, Stats,\nCharts Data)
+
+Admin --> App : POST/PUT/DELETE\n(Manage Players)
+Admin --> CSV : Provides\nCSV Data
+
+App --> DB : Mongoose Queries\n(CRUD, Aggregation)
+DB --> App : Query Results\n(Documents, Pipelines)
+
+CSV --> App : Seed Script\n(Parse & Ingest)
+
+@enduml
+
+
+' ============================================================
+'  2. LEVEL 1 DATA FLOW DIAGRAM
+' ============================================================
+@startuml level1_dfd
+
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Inter
+
+rectangle "User" as User #E0F2FE
+database "MongoDB" as DB #F1F5F9
+file "CSV File" as CSV #FEF3C7
+
+rectangle "1.0\nPlayer\nManagement" as P1 #BBF7D0
+rectangle "2.0\nMatch\nAnalytics" as P2 #BAE6FD
+rectangle "3.0\nVisualization\nEngine" as P3 #FDE68A
+rectangle "4.0\nData\nSeeding" as P4 #E9D5FF
+
+User --> P1 : Search, Filter,\nSort, CRUD
+User --> P2 : H2H Query,\nExplorer Filter
+User --> P3 : View Charts,\nDashboard
+
+P1 --> DB : find, create,\nupdate, delete
+P1 <-- DB : Player documents
+
+P2 --> DB : aggregate, $elemMatch,\n$lookup, $facet
+P2 <-- DB : Match results,\nPipeline output
+
+P3 <-- P1 : Player data
+P3 <-- P2 : Stats, Rivalries,\nTournament data
+P3 --> User : PieChart, BarChart,\nTables, Cards
+
+CSV --> P4 : Raw CSV rows
+P4 --> DB : bulkWrite,\nupsert
+
+@enduml
+
+
+' ============================================================
+'  3. USE CASE DIAGRAM
+' ============================================================
+@startuml use_case
+
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Inter
+skinparam UsecaseBorderColor #10B981
+skinparam ActorBorderColor #334155
+
+left to right direction
+
+actor "User" as U
+actor "Admin" as A
+
+rectangle "TennisLytics" {
+    usecase "Browse Player\nDashboard" as UC1
+    usecase "Search Players\n(by name/country)" as UC2
+    usecase "Sort Players\n(rank/name/hand)" as UC3
+    usecase "Filter Players\n(hand/nationality)" as UC4
+    usecase "View Player\nDetail & Stats" as UC5
+    usecase "Compare Head\nto Head" as UC6
+    usecase "Explore Matches\n(6 filter types)" as UC7
+    usecase "View Tournament\nAnalytics" as UC8
+    usecase "View Top\nRivalries" as UC9
+    usecase "View Player\nInsights" as UC10
+    usecase "Add New\nPlayer" as UC11
+    usecase "Update/Delete\nPlayer" as UC12
+    usecase "Seed Database\nfrom CSV" as UC13
+}
+
+U --> UC1
+U --> UC2
+U --> UC3
+U --> UC4
+U --> UC5
+U --> UC6
+U --> UC7
+U --> UC8
+U --> UC9
+U --> UC10
+
+A --> UC11
+A --> UC12
+A --> UC13
+
+UC2 ..> UC1 : <<extends>>
+UC3 ..> UC1 : <<extends>>
+UC4 ..> UC1 : <<extends>>
+UC5 ..> UC1 : <<extends>>
+
+@enduml
+
+
+' ============================================================
+'  4. ENTITY-RELATIONSHIP DIAGRAM
+' ============================================================
+@startuml er_diagram
+
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Inter
+skinparam ClassBorderColor #10B981
+skinparam ClassBackgroundColor #F0FDF4
+
+entity "Player" as Player {
+    * _id : ObjectId <<PK>>
+    --
+    * name : String
+    * nationality : String
+    rank : Number
+    hand : String {R, L, U}
+    createdAt : Date
+    updatedAt : Date
+}
+
+entity "Match" as Match {
+    * _id : ObjectId <<PK>>
+    --
+    * tourney_name : String
+    * surface : String {Hard, Clay, Grass}
+    * winner_id : ObjectId <<FK>>
+    * loser_id : ObjectId <<FK>>
+    createdAt : Date
+    updatedAt : Date
+}
+
+entity "Set (Embedded)" as SetDoc {
+    * setNum : Number
+    --
+    * winnerScore : Number
+    * loserScore : Number
+    tiebreak : Boolean
+}
+
+Player ||--o{ Match : "wins >"
+Player ||--o{ Match : "loses >"
+Match ||--|{ SetDoc : "contains >"
+
+note right of SetDoc
+    Embedded sub-document
+    (no separate collection)
+    _id: false
+end note
+
+@enduml
+
+
+' ============================================================
+'  5. COMPONENT DIAGRAM
+' ============================================================
+@startuml component_diagram
+
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Inter
+skinparam ComponentBorderColor #10B981
+
+package "Frontend (React + Vite)" as FE #E0F2FE {
+    [App.jsx\nRouter Config] as AppRouter
+    [Navbar] as Nav
+
+    package "Pages" {
+        [Dashboard] as PgDash
+        [PlayerDetail] as PgPlayer
+        [HeadToHead] as PgH2H
+        [Tournaments] as PgTour
+        [Rivalries] as PgRival
+        [MatchExplorer] as PgExplorer
+        [PlayerInsights] as PgInsights
+        [Sweeps] as PgSweeps
+    }
+
+    package "Components" {
+        [SearchableSelect] as CmpSearch
+        [Recharts\n(PieChart, BarChart)] as CmpCharts
+    }
+
+    [api.js\n(Axios Instance)] as ApiClient
+}
+
+package "Backend (Express.js)" as BE #BBF7D0 {
+    [server.js\nEntry Point] as Server
+    [players.js\n(15 routes)] as PlayerRoutes
+    [matches.js\n(16 routes)] as MatchRoutes
+
+    package "Models (Mongoose)" {
+        [Player.js] as PlayerModel
+        [Match.js] as MatchModel
+    }
+}
+
+database "MongoDB" as DB #F1F5F9
+
+ApiClient --> Server : HTTP /api/*\n(via Vite proxy)
+Server --> PlayerRoutes
+Server --> MatchRoutes
+PlayerRoutes --> PlayerModel
+MatchRoutes --> MatchModel
+PlayerModel --> DB
+MatchModel --> DB
+
+PgH2H --> CmpSearch
+PgDash --> CmpCharts
+PgTour --> CmpCharts
+PgInsights --> CmpCharts
+
+@enduml
+
+
+' ============================================================
+'  6. SEQUENCE DIAGRAM - Head-to-Head Flow
+' ============================================================
+@startuml sequence_h2h
+
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Inter
+skinparam SequenceArrowColor #10B981
+skinparam ParticipantBorderColor #334155
+
+actor User as U
+participant "React\nHeadToHead.jsx" as FE
+participant "SearchableSelect\nComponent" as SS
+participant "Express\nAPI Server" as API
+database "MongoDB" as DB
+
+U -> FE : Navigate to /head-to-head
+activate FE
+
+FE -> API : GET /api/players
+activate API
+API -> DB : Player.find().sort()
+DB --> API : [1477 players]
+API --> FE : { players, totalCount }
+deactivate API
+
+U -> SS : Type "Thiem"
+activate SS
+SS -> SS : Filter players\n(client-side regex)
+SS --> U : Show dropdown:\n"Dominic Thiem"
+U -> SS : Select "Dominic Thiem"
+SS --> FE : onChange(player1Id)
+deactivate SS
+
+U -> SS : Type "Moutet"
+activate SS
+SS --> U : Show "Corentin Moutet"
+U -> SS : Select player
+SS --> FE : onChange(player2Id)
+deactivate SS
+
+U -> FE : Click "Compare"
+FE -> API : GET /api/matches/head-to-head\n?player1=id1&player2=id2
+activate API
+
+API -> DB : Match.aggregate([\n  $match ($or),\n  $lookup (winner),\n  $unwind,\n  $lookup (loser),\n  $unwind,\n  $project\n])
+activate DB
+DB --> API : [matched documents]
+deactivate DB
+
+API -> API : Compute p1Wins,\np2Wins counts
+API --> FE : { totalMatches,\nplayer1Wins,\nplayer2Wins,\nmatches[] }
+deactivate API
+
+FE -> FE : Render summary cards\n+ match history table
+FE --> U : Display H2H results
+deactivate FE
+
+@enduml
+
+
+' ============================================================
+'  7. ACTIVITY DIAGRAM - Match Explorer
+' ============================================================
+@startuml activity_explorer
+
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Inter
+skinparam ActivityBorderColor #10B981
+
+start
+
+:User navigates to\n/match-explorer;
+
+:Load default filter\n(6-0 Sweeps);
+
+:Fetch matches from API\nGET /api/matches/sweeps;
+
+:Display results in table\nwith match count;
+
+repeat
+    :User clicks a\nfilter button;
+
+    if (Filter type?) then (Sweeps)
+        :Query: **$elemMatch**\n{ winnerScore: 6,\n  loserScore: 0 };
+    elseif (Tiebreakers) then
+        :Query: **$elemMatch**\n{ tiebreak: true };
+    elseif (Close Sets) then
+        :Query: **$elemMatch**\n{ winnerScore: 7,\n  loserScore: 5 };
+    elseif (Three-Setters) then
+        :Query: **$expr**\n{ $eq: [$size, 3] };
+    elseif (Straight Sets) then
+        :Query: **$expr**\n{ $eq: [$size, 2] };
+    else (Dominant Wins)
+        :Query: **$not + $elemMatch**\n{ loserScore: { $gt: 1 } };
+    endif
+
+    :Fetch from API endpoint;
+    :Update table with results;
+    :Display MongoDB query used;
+
+repeat while (User explores more?) is (Yes)
+
+stop
+
+@enduml
+
+
+' ============================================================
+'  8. CLASS DIAGRAM - Mongoose Models
+' ============================================================
+@startuml class_diagram
+
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Inter
+skinparam ClassBorderColor #10B981
+skinparam ClassBackgroundColor #F0FDF4
+
+class Player {
+    - _id : ObjectId
+    - name : String
+    - nationality : String
+    - rank : Number
+    - hand : String
+    - createdAt : Date
+    - updatedAt : Date
+    --
+    + find(filter) : Player[]
+    + findById(id) : Player
+    + create(data) : Player
+    + findByIdAndUpdate(id, data) : Player
+    + findByIdAndDelete(id) : Player
+    + countDocuments(filter) : Number
+    + distinct(field) : String[]
+    + aggregate(pipeline) : Object[]
+}
+
+class Match {
+    - _id : ObjectId
+    - tourney_name : String
+    - surface : String
+    - winner_id : ObjectId <<ref Player>>
+    - loser_id : ObjectId <<ref Player>>
+    - sets : Set[]
+    - createdAt : Date
+    - updatedAt : Date
+    --
+    + find(filter) : Match[]
+    + countDocuments(filter) : Number
+    + aggregate(pipeline) : Object[]
+    + populate(field) : Match
+}
+
+class Set <<embedded>> {
+    - setNum : Number
+    - winnerScore : Number
+    - loserScore : Number
+    - tiebreak : Boolean
+}
+
+Player "1" -- "0..*" Match : winner_id >
+Player "1" -- "0..*" Match : loser_id >
+Match "1" *-- "1..*" Set : sets (embedded) >
+
+@enduml
+
+
+' ============================================================
+'  9. DEPLOYMENT DIAGRAM
+' ============================================================
+@startuml deployment_diagram
+
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Inter
+skinparam NodeBorderColor #10B981
+
+node "User's Browser" as Browser #E0F2FE {
+    artifact "React SPA\n(Built JS bundle)" as ReactApp
+}
+
+cloud "Vercel" as Vercel #F0FDF4 {
+    node "Edge Network (CDN)" as CDN {
+        artifact "Static Assets\n(HTML, CSS, JS)" as Static
+    }
+    node "Serverless Functions\n(Optional API)" as Serverless {
+        artifact "Express API\n(31 endpoints)" as API
+    }
+}
+
+cloud "MongoDB Atlas" as Atlas #FEF3C7 {
+    database "tennis_analytics" as DB {
+        collections "players\n(1,477 docs)" as PlayerCol
+        collections "matches\n(11,190 docs)" as MatchCol
+    }
+}
+
+cloud "GitHub" as GH #F1F5F9 {
+    artifact "Source Code\nRepository" as Repo
+}
+
+Browser --> CDN : HTTPS\n(Static assets)
+Browser --> Serverless : HTTPS /api/*\n(REST calls)
+Serverless --> DB : MongoDB Driver\n(Connection string)
+
+Repo --> Vercel : Auto-deploy\non push
+
+note bottom of Atlas
+    Free Tier: M0 (512 MB)
+    Region: Mumbai (ap-south-1)
+end note
+
+note bottom of Vercel
+    Auto-deploy from GitHub
+    Environment variables for
+    MONGO_URI
+end note
+
+@enduml
+
+
+' ============================================================
+'  10. STATE DIAGRAM - Player Search
+' ============================================================
+@startuml state_search
+
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Inter
+skinparam StateBorderColor #10B981
+
+[*] --> Idle
+
+state Idle {
+    Idle : Search box empty
+    Idle : Dropdown closed
+}
+
+Idle --> Focused : User clicks\nsearch box
+
+state Focused {
+    Focused : Cursor active
+    Focused : Dropdown open\n(showing top 30 players)
+}
+
+Focused --> Filtering : User types\ncharacters
+
+state Filtering {
+    Filtering : Real-time client-side\nregex match
+    Filtering : Results update\ninstantly
+}
+
+Filtering --> Filtering : More chars typed
+Filtering --> Selected : User clicks\nor presses Enter
+
+state Selected {
+    Selected : Player ID stored
+    Selected : Name displayed
+    Selected : Dropdown closed
+}
+
+Selected --> Focused : User clicks\n"x" to clear
+
+Focused --> Idle : Click outside\nor press Escape
+
+Filtering --> Idle : Press Escape
+
+@enduml
+
