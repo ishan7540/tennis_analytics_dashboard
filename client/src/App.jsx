@@ -6,6 +6,8 @@ import HeadToHead from './pages/HeadToHead';
 import Sweeps from './pages/Sweeps';
 import Tournaments from './pages/Tournaments';
 import Rivalries from './pages/Rivalries';
+import MatchExplorer from './pages/MatchExplorer';
+import PlayerInsights from './pages/PlayerInsights';
 
 export default function App() {
   return (
@@ -18,6 +20,8 @@ export default function App() {
         <Route path="/sweeps" element={<Sweeps />} />
         <Route path="/tournaments" element={<Tournaments />} />
         <Route path="/rivalries" element={<Rivalries />} />
+        <Route path="/match-explorer" element={<MatchExplorer />} />
+        <Route path="/player-insights" element={<PlayerInsights />} />
       </Routes>
     </Router>
   );

@@ -150,6 +150,74 @@ router.get('/by-nationality', async (req, res) => {
 });
 
 // -------------------------------------------------------
+// GET /api/players/hand-stats
+// Uses: Simple aggregation — $group by hand field + $sort
+// -------------------------------------------------------
+router.get('/hand-stats', async (req, res) => {
+  try {
+    const stats = await Player.aggregate([
+      { $group: { _id: '$hand', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]);
+    res.json(stats);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------
+// GET /api/players/top-countries
+// Uses: Simple aggregation — $group by nationality + $sort + $limit
+// -------------------------------------------------------
+router.get('/top-countries', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit, 10) || 15;
+    const stats = await Player.aggregate([
+      { $group: { _id: '$nationality', playerCount: { $sum: 1 } } },
+      { $sort: { playerCount: -1 } },
+      { $limit: limit },
+    ]);
+    res.json(stats);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------
+// GET /api/players/left-handed
+// Uses: Simple .find() with field value match — { hand: 'L' }
+// -------------------------------------------------------
+router.get('/left-handed', async (req, res) => {
+  try {
+    const players = await Player.find({ hand: 'L' })
+      .sort({ rank: 1 })
+      .lean();
+    res.json({ count: players.length, players });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------
+// GET /api/players/rank-range?min=50&max=100
+// Uses: $gte and $lte range operators
+// -------------------------------------------------------
+router.get('/rank-range', async (req, res) => {
+  try {
+    const min = parseInt(req.query.min, 10) || 1;
+    const max = parseInt(req.query.max, 10) || 100;
+    const players = await Player.find({
+      rank: { $gte: min, $lte: max },
+    })
+      .sort({ rank: 1 })
+      .lean();
+    res.json({ count: players.length, players });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------
 // POST /api/players — Add a new player (Basic CRUD)
 // Uses: .create()
 // -------------------------------------------------------

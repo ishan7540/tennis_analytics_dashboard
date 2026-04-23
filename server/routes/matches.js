@@ -397,6 +397,104 @@ router.get('/straights', async (req, res) => {
 });
 
 // -------------------------------------------------------
+// GET /api/matches/close-sets
+// Uses: $elemMatch — sets that went 7-5 (close but no tiebreak)
+// -------------------------------------------------------
+router.get('/close-sets', async (req, res) => {
+  try {
+    const matches = await Match.find({
+      sets: {
+        $elemMatch: { winnerScore: 7, loserScore: 5 },
+      },
+    })
+      .populate('winner_id', 'name nationality')
+      .populate('loser_id', 'name nationality')
+      .limit(100)
+      .lean();
+
+    res.json({ count: matches.length, matches });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------
+// GET /api/matches/three-setters
+// Uses: $expr + $size — matches that went to a deciding 3rd set
+// -------------------------------------------------------
+router.get('/three-setters', async (req, res) => {
+  try {
+    const matches = await Match.find({
+      $expr: { $eq: [{ $size: '$sets' }, 3] },
+    })
+      .populate('winner_id', 'name nationality')
+      .populate('loser_id', 'name nationality')
+      .limit(100)
+      .lean();
+
+    const total = await Match.countDocuments({
+      $expr: { $eq: [{ $size: '$sets' }, 3] },
+    });
+
+    res.json({ totalCount: total, showing: matches.length, matches });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------
+// GET /api/matches/dominant-wins
+// Uses: $all + $elemMatch — matches where EVERY set was won 6-0 or 6-1
+// (Double bagel / double breadstick)
+// -------------------------------------------------------
+router.get('/dominant-wins', async (req, res) => {
+  try {
+    // Find matches where all sets had loserScore <= 1
+    // Using $not + $elemMatch to exclude any set where loser scored > 1
+    const matches = await Match.find({
+      'sets.0': { $exists: true },
+      sets: {
+        $not: {
+          $elemMatch: { loserScore: { $gt: 1 } },
+        },
+      },
+    })
+      .populate('winner_id', 'name nationality')
+      .populate('loser_id', 'name nationality')
+      .limit(100)
+      .lean();
+
+    res.json({ count: matches.length, matches });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------
+// GET /api/matches/filter?surface=Hard&tournament=Wimbledon
+// Uses: Simple $and query — combine multiple field filters
+// -------------------------------------------------------
+router.get('/filter', async (req, res) => {
+  try {
+    const { surface, tournament } = req.query;
+    const filter = {};
+    if (surface) filter.surface = surface;
+    if (tournament) filter.tourney_name = { $regex: tournament, $options: 'i' };
+
+    const matches = await Match.find(filter)
+      .populate('winner_id', 'name nationality')
+      .populate('loser_id', 'name nationality')
+      .limit(50)
+      .lean();
+
+    const total = await Match.countDocuments(filter);
+    res.json({ totalCount: total, showing: matches.length, matches });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// -------------------------------------------------------
 // GET /api/matches/top-rivalries
 // Uses: Advanced aggregation with $addFields, $cond, $toString,
 //       $concat, $group, $sort, $limit, $lookup, $unwind,
