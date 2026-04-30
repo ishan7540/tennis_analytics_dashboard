@@ -27,12 +27,12 @@
 % ============================================================
 %  STYLING
 % ============================================================
-\definecolor{codegreen}{rgb}{0.0,0.5,0.0}
+\definecolor{codegreen}{HTML}{1E3F20}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
 \definecolor{backcolour}{rgb}{0.97,0.97,0.97}
-\definecolor{brandgreen}{HTML}{10B981}
-\definecolor{brandcyan}{HTML}{06B6D4}
+\definecolor{brandgreen}{HTML}{1B4332}
+\definecolor{brandcyan}{HTML}{0F3057}
 
 \lstdefinestyle{codestyle}{
     backgroundcolor=\color{backcolour},
@@ -67,7 +67,7 @@
 \fancyhf{}
 \fancyhead[L]{\small\textit{TennisLytics --- Tennis Analytics Dashboard}}
 \fancyhead[R]{\small\thepage}
-\fancyfoot[C]{\small\textit{MERN Stack Project Report}}
+\fancyfoot[C]{\small\textit{Data Engineering Project Report}}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
 
@@ -90,22 +90,23 @@
     {\Huge\bfseries TennisLytics}\\[0.5cm]
     {\LARGE\color{brandgreen} Tennis Analytics Dashboard}\\[1.5cm]
 
-    {\Large A Full-Stack MERN Application}\\[0.3cm]
-    {\large MongoDB $\cdot$ Express.js $\cdot$ React.js $\cdot$ Node.js}\\[3cm]
 
     {\large\textbf{Project Report}}\\[0.5cm]
-    {\large Database Management Systems}\\[2cm]
 
     \begin{tabular}{rl}
-        \textbf{Submitted by:} & \textit{[Your Name]} \\
-        \textbf{Roll No.:}     & \textit{[Your Roll Number]} \\
-        \textbf{Course:}       & \textit{[Course Name]} \\
-        \textbf{Semester:}     & \textit{[Semester]} \\
-        \textbf{Guided by:}    & \textit{[Faculty Name]} \\
+        \textbf{Submitted by:} & \textit{Ishan Satya Prakash} \\
+        \textbf{Roll No.:}     & \textit{102303449} \\
+        \textbf{Course:}       & \textit{Data engineering (UCS677)} \\
+        \textbf{Semester:}     & \textit{6} \\
+        \textbf{Guided by:}    & \textit{Archana Singh} \\
     \end{tabular}
-
-    \vfill
-    {\large\textit{[University / College Name]}}\\[0.3cm]
+    
+    \vspace{2cm}
+    \centering
+    \includegraphics[width=5cm, height=6cm]{thapar.png}
+    
+    \vspace{2cm}
+    {\large\textit{Thapar Institute of Engineering and Technology}}\\[0.3cm]
     {\large April 2026}
 \end{titlepage}
 
@@ -186,6 +187,7 @@ Design and implement a \textbf{full-stack web application} that:
     \end{itemize}
 \end{enumerate}
 
+\newpage
 \subsection{Objectives}
 \begin{enumerate}[noitemsep]
     \item Parse and seed 11,190 match records involving 1,477 players from ATP CSV data
@@ -275,124 +277,39 @@ This section presents the system's architectural diagrams. PlantUML source code 
 The context diagram shows the system boundary with external entities (User, MongoDB Atlas, CSV Data Source).
 
 \begin{center}
-    \fbox{\parbox{0.85\textwidth}{
-        \centering
-        \vspace{2cm}
-        \textit{[Insert Context Level Diagram here]}\\
-        \textit{Generated from: diagrams.puml --- @startuml context\_diagram}
-        \vspace{2cm}
-    }}
+    \includegraphics[width=16cm, height=12cm]{dfd_0.png}
     \captionof{figure}{Context Level Diagram (Level 0 DFD)}
 \end{center}
+\vspace{2cm}
 
 \subsection{Level 1 Data Flow Diagram}
 
 The Level 1 DFD decomposes the system into its major processes: Player Management, Match Analytics, Visualization Engine, and Data Seeding.
 
 \begin{center}
-    \fbox{\parbox{0.85\textwidth}{
-        \centering
-        \vspace{3cm}
-        \textit{[Insert Level 1 DFD here]}\\
-        \textit{Generated from: diagrams.puml --- @startuml level1\_dfd}
-        \vspace{3cm}
-    }}
+    \includegraphics[width=16cm, height=12cm]{dfd_1.png}
     \captionof{figure}{Level 1 Data Flow Diagram}
 \end{center}
 
-\subsection{Use Case Diagram}
 
-\begin{center}
-    \fbox{\parbox{0.85\textwidth}{
-        \centering
-        \vspace{3cm}
-        \textit{[Insert Use Case Diagram here]}\\
-        \textit{Generated from: diagrams.puml --- @startuml use\_case}
-        \vspace{3cm}
-    }}
-    \captionof{figure}{Use Case Diagram}
-\end{center}
-
-\subsection{Entity Relationship Diagram}
-
-\begin{center}
-    \fbox{\parbox{0.85\textwidth}{
-        \centering
-        \vspace{3cm}
-        \textit{[Insert ER Diagram here]}\\
-        \textit{Generated from: diagrams.puml --- @startuml er\_diagram}
-        \vspace{3cm}
-    }}
-    \captionof{figure}{Entity-Relationship Diagram}
-\end{center}
 
 
 % ============================================================
 %  ADDITIONAL UML DIAGRAMS
 % ============================================================
-\newpage
-\subsection{Component Diagram}
 
-\begin{center}
-    \fbox{\parbox{0.85\textwidth}{
-        \centering
-        \vspace{3cm}
-        \textit{[Insert Component Diagram here]}\\
-        \textit{Generated from: diagrams.puml --- @startuml component\_diagram}
-        \vspace{3cm}
-    }}
-    \captionof{figure}{System Component Diagram}
-\end{center}
-
-\subsection{Sequence Diagram --- Head-to-Head Flow}
-
-\begin{center}
-    \fbox{\parbox{0.85\textwidth}{
-        \centering
-        \vspace{3cm}
-        \textit{[Insert Sequence Diagram here]}\\
-        \textit{Generated from: diagrams.puml --- @startuml sequence\_h2h}
-        \vspace{3cm}
-    }}
-    \captionof{figure}{Sequence Diagram: Head-to-Head Comparison Flow}
-\end{center}
-
-\subsection{Activity Diagram --- Match Explorer}
-
-\begin{center}
-    \fbox{\parbox{0.85\textwidth}{
-        \centering
-        \vspace{3cm}
-        \textit{[Insert Activity Diagram here]}\\
-        \textit{Generated from: diagrams.puml --- @startuml activity\_explorer}
-        \vspace{3cm}
-    }}
-    \captionof{figure}{Activity Diagram: Match Explorer Workflow}
-\end{center}
 
 \subsection{Class Diagram --- Mongoose Models}
 
 \begin{center}
-    \fbox{\parbox{0.85\textwidth}{
-        \centering
-        \vspace{3cm}
-        \textit{[Insert Class Diagram here]}\\
-        \textit{Generated from: diagrams.puml --- @startuml class\_diagram}
-        \vspace{3cm}
-    }}
+    \includegraphics[width=14cm, height=9cm]{mongoose_schema.png}
     \captionof{figure}{Class Diagram: Mongoose Models}
 \end{center}
 
 \subsection{Deployment Diagram}
 
 \begin{center}
-    \fbox{\parbox{0.85\textwidth}{
-        \centering
-        \vspace{3cm}
-        \textit{[Insert Deployment Diagram here]}\\
-        \textit{Generated from: diagrams.puml --- @startuml deployment\_diagram}
-        \vspace{3cm}
-    }}
+    \includegraphics[width=14cm, height=9cm]{deployment.png}
     \captionof{figure}{Deployment Diagram (Vercel + MongoDB Atlas)}
 \end{center}
 
@@ -461,6 +378,7 @@ The Level 1 DFD decomposes the system into its major processes: Player Managemen
     \hline
 \end{tabular}
 
+\newpage
 \subsection{MongoDB Schema Design}
 
 \subsubsection{Player Collection}
@@ -491,6 +409,8 @@ const matchSchema = new mongoose.Schema({
 }, { timestamps: true });
 \end{lstlisting}
 
+\subsubsection{Database Indexing Strategy}
+To optimize query performance across the 11,000+ match records and 1,400+ players, several indexes were implemented in the schema definitions. Simple single-field indexes were added on frequently filtered and sorted fields such as \texttt{rank}, \texttt{nationality}, \texttt{winner\_id}, and \texttt{loser\_id}. To support efficient text search, a text index was applied to the player \texttt{name} field. Furthermore, compound indexes (e.g., \texttt{\{ winner\_id: 1, loser\_id: 1 \}}) were created to optimize complex aggregations like head-to-head comparisons, and multikey indexes on embedded document fields (e.g., \texttt{sets.tiebreak} and \texttt{sets.loserScore}) were utilized to accelerate array-based \texttt{\$elemMatch} queries.
 
 % ============================================================
 %  6. TOOLS USED
@@ -565,18 +485,11 @@ const matchSchema = new mongoose.Schema({
 \newpage
 \section{Sample Screenshots}
 
-This section presents screenshots from the running application. The frontend runs on \texttt{http://localhost:5173} during development with hot module replacement via Vite.
-
 \subsection{Player Dashboard}
-The main dashboard displays all ranked players in a sortable table with filter controls for hand preference, nationality, and a ``Ranked Only'' toggle. Overview stats cards at the top show total matches, tiebreakers, sweeps, and surface distribution.
+The main dashboard displays all ranked players in a sortable table with filter controls for hand preference, nationality, and a ``Ranked Only'' toggle.
 
 \begin{center}
-    \fbox{\parbox{0.85\textwidth}{
-        \centering
-        \vspace{4cm}
-        \textit{[Insert Dashboard Screenshot]}
-        \vspace{4cm}
-    }}
+    \includegraphics[width=14cm, height=7cm]{main_dashboard.png}
     \captionof{figure}{Player Dashboard with Stats Cards and Sortable Table}
 \end{center}
 
@@ -584,12 +497,7 @@ The main dashboard displays all ranked players in a sortable table with filter c
 Shows a selected player's profile with overall win rate, total wins/matches, a surface win-percentage PieChart, surface breakdown progress bars, and recent match history table.
 
 \begin{center}
-    \fbox{\parbox{0.85\textwidth}{
-        \centering
-        \vspace{4cm}
-        \textit{[Insert Player Detail Screenshot]}
-        \vspace{4cm}
-    }}
+    \includegraphics[width=14cm, height=7cm]{player_detail.png}
     \captionof{figure}{Player Detail View with Surface Analytics}
 \end{center}
 
@@ -597,27 +505,16 @@ Shows a selected player's profile with overall win rate, total wins/matches, a s
 Users search for two players using searchable dropdown components. The result displays win counts for each player, total matches, and a chronological match history with scores and surface badges.
 
 \begin{center}
-    \fbox{\parbox{0.85\textwidth}{
-        \centering
-        \vspace{4cm}
-        \textit{[Insert H2H Screenshot]}
-        \vspace{4cm}
-    }}
+    \includegraphics[width=14cm, height=7.5cm]{h2h.png}
     \captionof{figure}{Head-to-Head Comparison with Searchable Dropdowns}
 \end{center}
 
-\newpage
 
 \subsection{Tournament Analytics}
 Displays surface distribution cards, a horizontal BarChart of top tournaments by match count, a filterable top winners leaderboard, and a complete tournament table.
 
 \begin{center}
-    \fbox{\parbox{0.85\textwidth}{
-        \centering
-        \vspace{4cm}
-        \textit{[Insert Tournament Analytics Screenshot]}
-        \vspace{4cm}
-    }}
+    \includegraphics[width=14cm, height=7.5cm]{tounament_analytics.png}
     \captionof{figure}{Tournament Analytics with BarChart and Leaderboard}
 \end{center}
 
@@ -625,12 +522,7 @@ Displays surface distribution cards, a horizontal BarChart of top tournaments by
 Identifies player pairs who played the most matches against each other. Each rivalry card shows total match count, per-player win breakdown with a stacked progress bar, surfaces, and tournament count.
 
 \begin{center}
-    \fbox{\parbox{0.85\textwidth}{
-        \centering
-        \vspace{4cm}
-        \textit{[Insert Rivalries Screenshot]}
-        \vspace{4cm}
-    }}
+    \includegraphics[width=14cm, height=7.5cm]{top.png}
     \captionof{figure}{Top Rivalries with Win Breakdown Bars}
 \end{center}
 
@@ -638,12 +530,7 @@ Identifies player pairs who played the most matches against each other. Each riv
 Six filter buttons let users explore matches by query type: 6-0 Sweeps (\texttt{\$elemMatch}), Tiebreakers, Close Sets (7-5), Three-Setters (\texttt{\$expr + \$size}), Straight Sets, and Dominant Wins (\texttt{\$not + \$elemMatch}). Each filter displays the MongoDB query used.
 
 \begin{center}
-    \fbox{\parbox{0.85\textwidth}{
-        \centering
-        \vspace{4cm}
-        \textit{[Insert Match Explorer Screenshot]}
-        \vspace{4cm}
-    }}
+    \includegraphics[width=14cm, height=7.5cm]{match_explorer.png}
     \captionof{figure}{Match Explorer with Query-Based Filters}
 \end{center}
 
@@ -651,14 +538,10 @@ Six filter buttons let users explore matches by query type: 6-0 Sweeps (\texttt{
 Demographics page showing hand distribution PieChart, top countries BarChart, a left-handed players list, and an interactive rank range finder with \texttt{\$gte}/\texttt{\$lte} sliders.
 
 \begin{center}
-    \fbox{\parbox{0.85\textwidth}{
-        \centering
-        \vspace{4cm}
-        \textit{[Insert Player Insights Screenshot]}
-        \vspace{4cm}
-    }}
+    \includegraphics[width=14cm, height=7.5cm]{player_insight.png}
     \captionof{figure}{Player Insights with Demographics Charts}
 \end{center}
+
 
 
 % ============================================================
@@ -710,6 +593,7 @@ The application exposes \textbf{31 API endpoints} across two route modules. The 
     \hline
 \end{longtable}
 
+\newpage
 \subsubsection{Match Routes (\texttt{/api/matches})}
 
 \begin{longtable}{|p{4.5cm}|l|p{5cm}|}
@@ -768,31 +652,31 @@ The following table summarizes all \textbf{25+ distinct MongoDB operators/featur
     \hline
     Query       & \texttt{\$regex, \$options}               & Search, Tournament filter \\
     \hline
-    Query       & \texttt{\$or}                            & H2H, Player matches \\
+    Query       & \texttt{\$or}                             & H2H, Player matches \\
     \hline
-    Query       & \texttt{\$ne}                            & Ranked-only filter \\
+    Query       & \texttt{\$ne}                             & Ranked-only filter \\
     \hline
     Query       & \texttt{\$gte, \$lte}                     & Rank range finder \\
     \hline
-    Query       & \texttt{\$gt}                            & Dominant wins \\
+    Query       & \texttt{\$gt}                             & Dominant wins \\
     \hline
     Array       & \texttt{\$elemMatch}                     & Sweeps, Tiebreakers, Close sets \\
     \hline
-    Array       & \texttt{\$not + \$elemMatch}              & Dominant wins \\
+    Array       & \texttt{\$not + \$elemMatch}             & Dominant wins \\
     \hline
-    Array       & \texttt{\$exists}                        & Dominant wins (sets.0) \\
+    Array       & \texttt{\$exists}                         & Dominant wins (sets.0) \\
     \hline
-    Expression  & \texttt{\$expr + \$size}                  & Straight sets, Three-setters \\
+    Expression  & \texttt{\$expr + \$size}                 & Straight sets, Three-setters \\
     \hline
     Aggregation & \texttt{\$match}                         & All aggregation pipelines \\
     \hline
-    Aggregation & \texttt{\$group + \$sum}                  & Surface stats, Countries \\
+    Aggregation & \texttt{\$group + \$sum}                 & Surface stats, Countries \\
     \hline
     Aggregation & \texttt{\$sort}                          & All leaderboards \\
     \hline
     Aggregation & \texttt{\$limit}                         & Top-N queries \\
     \hline
-    Aggregation & \texttt{\$lookup + \$unwind}              & H2H, Top winners, Rivalries \\
+    Aggregation & \texttt{\$lookup + \$unwind}             & H2H, Top winners, Rivalries \\
     \hline
     Aggregation & \texttt{\$project}                       & Clean output shaping \\
     \hline
@@ -808,7 +692,7 @@ The following table summarizes all \textbf{25+ distinct MongoDB operators/featur
     \hline
     Aggregation & \texttt{\$filter}                        & Rivalry win count \\
     \hline
-    Aggregation & \texttt{\$toString + \$concat}            & Pair key generation \\
+    Aggregation & \texttt{\$toString + \$concat}             & Pair key generation \\
     \hline
     Utility     & \texttt{countDocuments}                   & Total counts \\
     \hline
@@ -852,6 +736,113 @@ The following table summarizes all \textbf{25+ distinct MongoDB operators/featur
 
 
 % ============================================================
+%  KEY QUERIES AND THEIR OUTPUT
+% ============================================================
+\newpage
+\section{Key Queries and Their Output}
+
+This section showcases key MongoDB queries used in the application along with their terminal output. Each query is logged automatically when the corresponding feature is triggered from the frontend.
+
+% --- Query 1: Find all players (with sorting) ---
+\subsection{Find All Players with Sorting}
+\textbf{Route:} \texttt{GET /api/players} \\
+\textbf{Operation:} \texttt{aggregate()} with \texttt{\$match}, \texttt{\$addFields}, \texttt{\$cond}, \texttt{\$sort}, \texttt{\$project}
+
+\begin{lstlisting}[style=codestyle, caption={Player listing aggregation pipeline}]
+[
+  { "$match": {} },
+  { "$addFields": {
+      "_sortRank": {
+        "$cond": {
+          "if": { "$eq": ["$rank", null] },
+          "then": 99999,
+          "else": "$rank"
+        }
+      }
+  }},
+  { "$sort": { "_sortRank": 1 } },
+  { "$project": { "_sortRank": 0 } }
+]
+\end{lstlisting}
+
+\begin{center}
+    \includegraphics[width=14cm]{q1.png}
+    \captionof{figure}{Terminal output: Find all players with null-safe rank sorting}
+\end{center}
+
+% --- Query 2: $elemMatch (Sweeps) ---
+\subsection{Array Query with \$elemMatch --- 6-0 Sweeps}
+\textbf{Route:} \texttt{GET /api/matches/sweeps} \\
+\textbf{Operation:} \texttt{find()} with \texttt{\$elemMatch}
+
+\begin{lstlisting}[style=codestyle, caption={\$elemMatch query for 6-0 set sweeps}]
+{
+  "sets": {
+    "$elemMatch": {
+      "winnerScore": 6,
+      "loserScore": 0
+    }
+  }
+}
+\end{lstlisting}
+
+\begin{center}
+    \includegraphics[width=14cm]{q2.png}
+    \captionof{figure}{Terminal output: \$elemMatch query finding matches with 6-0 sets}
+\end{center}
+
+
+\pagebreak
+% --- Query 4: $or query (Head-to-Head) ---
+\subsection{Logical Query with \$or --- Head-to-Head}
+\textbf{Route:} \texttt{GET /api/matches/head-to-head} \\
+\textbf{Operation:} \texttt{find()} with \texttt{\$or} + \texttt{populate()}
+
+\begin{lstlisting}[style=codestyle, caption={\$or query for head-to-head matches}]
+{
+  "$or": [
+    { "winner_id": "<Player1_ObjectId>",
+      "loser_id":  "<Player2_ObjectId>" },
+    { "winner_id": "<Player2_ObjectId>",
+      "loser_id":  "<Player1_ObjectId>" }
+  ]
+}
+\end{lstlisting}
+
+\begin{center}
+    \includegraphics[width=14cm]{q3.png}
+    \captionof{figure}{Terminal output: \$or query for head-to-head comparison}
+\end{center}
+
+\pagebreak
+% --- Query 6: $not + $elemMatch (Dominant Wins) ---
+\subsection{Negation Query with \$not --- Dominant Wins}
+\textbf{Route:} \texttt{GET /api/matches/dominant-wins} \\
+\textbf{Operation:} \texttt{find()} with \texttt{\$not}, \texttt{\$elemMatch}, \texttt{\$exists}, \texttt{\$gt}
+
+\begin{lstlisting}[style=codestyle, caption={\$not + \$elemMatch for dominant wins}]
+{
+  "sets.0": { "$exists": true },
+  "sets": {
+    "$not": {
+      "$elemMatch": {
+        "loserScore": { "$gt": 1 }
+      }
+    }
+  }
+}
+\end{lstlisting}
+
+\begin{center}
+    \includegraphics[width=14cm]{q4.png}
+    \captionof{figure}{Terminal output: \$not + \$elemMatch for matches won with all sets $\leq$ 6-1}
+\end{center}
+
+
+
+
+
+% ============================================================
 %  9. CONCLUSION
 % ============================================================
 \newpage
@@ -879,7 +870,7 @@ The \textbf{TennisLytics} project successfully demonstrates a production-grade f
     \item \textbf{Authentication}: Add JWT-based user authentication for personalized dashboards.
     \item \textbf{Real-Time Data}: Integrate live ATP API feeds for automatic data updates.
     \item \textbf{Advanced Analytics}: Add Elo rating calculations, win prediction models using match statistics (aces, break points, serve percentages).
-    \item \textbf{Indexing}: Create compound indexes on frequently queried fields (\texttt{winner\_id}, \texttt{loser\_id}, \texttt{surface}) for aggregation performance.
+
     \item \textbf{Testing}: Add unit tests (Jest) for API endpoints and integration tests (Cypress) for frontend workflows.
     \item \textbf{Mobile App}: Extend to React Native for iOS/Android companion apps.
 \end{enumerate}

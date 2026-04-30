@@ -3,25 +3,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const Player = require('../models/Player');
 const Match = require('../models/Match');
-
-// -------------------------------------------------------
-// Helper: Pretty-print MongoDB queries in the terminal
-// -------------------------------------------------------
-function logQuery(routeName, collection, operation, queryOrPipeline, resultCount) {
-  const divider = '═'.repeat(60);
-  const timestamp = new Date().toLocaleTimeString();
-  console.log(`\n\x1b[36m${divider}\x1b[0m`);
-  console.log(`\x1b[33m📡 [${timestamp}] API CALLED: ${routeName}\x1b[0m`);
-  console.log(`\x1b[36m${divider}\x1b[0m`);
-  console.log(`\x1b[32m   Collection : \x1b[0m${collection}`);
-  console.log(`\x1b[32m   Operation  : \x1b[0m${operation}`);
-  console.log(`\x1b[32m   Query      :\x1b[0m`);
-  console.log(`\x1b[37m${JSON.stringify(queryOrPipeline, null, 2)}\x1b[0m`);
-  if (resultCount !== undefined) {
-    console.log(`\x1b[32m   Results    : \x1b[0m\x1b[33m${resultCount} document(s)\x1b[0m`);
-  }
-  console.log(`\x1b[36m${divider}\x1b[0m\n`);
-}
+const logQuery = require('../utils/queryLogger');
 
 // -------------------------------------------------------
 // GET /api/players — Return all players
