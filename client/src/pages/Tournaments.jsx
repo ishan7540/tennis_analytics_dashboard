@@ -6,18 +6,12 @@ const SURFACE_COLORS = { Hard: '#06b6d4', Clay: '#f59e0b', Grass: '#10b981', Car
 
 export default function Tournaments() {
   const [tournaments, setTournaments] = useState([]);
-  const [topWinners, setTopWinners] = useState([]);
   const [surfaceStats, setSurfaceStats] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedSurface, setSelectedSurface] = useState('');
 
   useEffect(() => {
     fetchData();
   }, []);
-
-  useEffect(() => {
-    fetchTopWinners();
-  }, [selectedSurface]);
 
   const fetchData = async () => {
     try {
@@ -29,14 +23,6 @@ export default function Tournaments() {
       setSurfaceStats(surfRes.data);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
-  };
-
-  const fetchTopWinners = async () => {
-    try {
-      const params = selectedSurface ? `?surface=${selectedSurface}&limit=15` : '?limit=15';
-      const { data } = await api.get(`/matches/top-winners${params}`);
-      setTopWinners(data);
-    } catch (err) { console.error(err); }
   };
 
   const CustomTooltip = ({ active, payload, label }) => {
@@ -81,7 +67,7 @@ export default function Tournaments() {
           🏆 Tournament Analytics
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-          Explore tournament data, surface distribution, and top winners
+          Explore tournament data and surface distribution
         </p>
       </div>
 
@@ -102,77 +88,33 @@ export default function Tournaments() {
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem' }}>
-        {/* Tournament Bar Chart */}
-        <div className="glass-card animate-fade-up" style={{ padding: '1.5rem', animationDelay: '0.1s' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '1rem' }}>Top Tournaments by Matches</h2>
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={chartData} layout="vertical" margin={{ left: 20, right: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.1)" />
-              <XAxis type="number" tick={{ fill: '#94a3b8', fontSize: 12 }} />
-              <YAxis type="category" dataKey="name" width={130} tick={{ fill: '#94a3b8', fontSize: 11 }} />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="matches" radius={[0, 4, 4, 0]}>
-                {chartData.map((entry, idx) => (
-                  <Cell key={idx} fill={`hsl(${160 + idx * 8}, 70%, ${55 - idx * 1.5}%)`} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+      {/* Tournament Bar Chart */}
+      <div className="glass-card animate-fade-up" style={{ padding: '1.5rem', marginBottom: '1.5rem', animationDelay: '0.1s' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <h2 style={{ fontSize: '1rem', fontWeight: 600 }}>Top Tournaments by Matches</h2>
+          <code style={{
+            fontSize: '0.65rem', color: 'var(--accent-cyan)',
+            background: 'rgba(6,182,212,0.08)', padding: '0.25rem 0.5rem',
+            borderRadius: '4px',
+          }}>$group + $sort + $limit</code>
         </div>
-
-        {/* Top Winners */}
-        <div className="glass-card animate-fade-up" style={{ padding: '1.5rem', animationDelay: '0.2s' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h2 style={{ fontSize: '1rem', fontWeight: 600 }}>🏅 Top Winners</h2>
-            <select
-              className="input-field"
-              value={selectedSurface}
-              onChange={(e) => setSelectedSurface(e.target.value)}
-              style={{ width: '140px' }}
-              id="filter-top-surface"
-            >
-              <option value="">All Surfaces</option>
-              <option value="Hard">🏟️ Hard</option>
-              <option value="Clay">🧱 Clay</option>
-              <option value="Grass">🌿 Grass</option>
-            </select>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-            {topWinners.map((w, idx) => (
-              <div key={idx} style={{
-                display: 'flex', alignItems: 'center', gap: '0.75rem',
-                padding: '0.625rem 0', borderBottom: '1px solid rgba(148,163,184,0.06)',
-              }}>
-                <span style={{
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  width: '2rem', height: '2rem', borderRadius: '50%',
-                  background: idx < 3 ? 'var(--gradient-brand)' : 'rgba(148,163,184,0.1)',
-                  color: idx < 3 ? 'white' : 'var(--text-secondary)',
-                  fontWeight: 700, fontSize: '0.75rem', flexShrink: 0,
-                }}>
-                  {idx + 1}
-                </span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {w.name}
-                  </div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                    {w.nationality} · {w.tournamentCount} tournaments
-                  </div>
-                </div>
-                <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <span style={{ fontWeight: 700, color: 'var(--accent-emerald)', fontSize: '0.875rem' }}>{w.wins}</span>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}> wins</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={chartData} layout="vertical" margin={{ left: 20, right: 20 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.1)" />
+            <XAxis type="number" tick={{ fill: '#94a3b8', fontSize: 12 }} />
+            <YAxis type="category" dataKey="name" width={130} tick={{ fill: '#94a3b8', fontSize: 11 }} />
+            <Tooltip content={<CustomTooltip />} />
+            <Bar dataKey="matches" radius={[0, 4, 4, 0]}>
+              {chartData.map((entry, idx) => (
+                <Cell key={idx} fill={`hsl(${160 + idx * 8}, 70%, ${55 - idx * 1.5}%)`} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
       </div>
 
       {/* Full Tournament Table */}
-      <div className="glass-card animate-fade-up" style={{ marginTop: '1.5rem', overflow: 'hidden', animationDelay: '0.3s' }}>
+      <div className="glass-card animate-fade-up" style={{ overflow: 'hidden', animationDelay: '0.2s' }}>
         <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border-color)', fontWeight: 600, fontSize: '0.875rem' }}>
           All Tournaments
         </div>

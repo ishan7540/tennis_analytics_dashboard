@@ -5,7 +5,9 @@ import api from '../api';
 export default function Dashboard() {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [overview, setOverview] = useState(null);
+  const [playerCount, setPlayerCount] = useState(0);
+  const [matchCount, setMatchCount] = useState(0);
+  const [surfaceStats, setSurfaceStats] = useState([]);
   const [form, setForm] = useState({ name: '', nationality: '', rank: '', hand: 'R' });
   const [submitting, setSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,7 +21,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchPlayers();
-    fetchOverview();
+    fetchStats();
     fetchNationalities();
   }, [sortField, sortOrder, filterHand, filterNat, rankedOnly]);
 
@@ -40,12 +42,19 @@ export default function Dashboard() {
     }
   };
 
-  const fetchOverview = async () => {
+  const fetchStats = async () => {
     try {
-      const { data } = await api.get('/matches/overview');
-      setOverview(data);
+      // Use simple individual endpoints instead of complex $facet overview
+      const [countRes, matchCountRes, surfaceRes] = await Promise.all([
+        api.get('/players/count'),
+        api.get('/matches/count'),
+        api.get('/matches/surface-stats'),
+      ]);
+      setPlayerCount(countRes.data.count);
+      setMatchCount(matchCountRes.data.count);
+      setSurfaceStats(surfaceRes.data);
     } catch (err) {
-      console.error('Failed to fetch overview:', err);
+      console.error('Failed to fetch stats:', err);
     }
   };
 
@@ -115,45 +124,35 @@ export default function Dashboard() {
       </div>
 
       {/* ===== STATS CARDS ===== */}
-      {overview && (
-        <div className="animate-fade-up" style={{
-          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-          gap: '0.75rem', marginBottom: '1.5rem', animationDelay: '0.05s',
-        }}>
-          <div className="glass-card" style={{ padding: '1rem', textAlign: 'center' }}>
-            <div className="stat-number" style={{ fontSize: '1.75rem' }}>{players.length}</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Players</div>
-          </div>
-          <div className="glass-card" style={{ padding: '1rem', textAlign: 'center' }}>
-            <div className="stat-number" style={{ fontSize: '1.75rem' }}>{overview.totalMatches?.toLocaleString()}</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Total Matches</div>
-          </div>
-          <div className="glass-card" style={{ padding: '1rem', textAlign: 'center' }}>
-            <div className="stat-number" style={{ fontSize: '1.75rem' }}>{overview.tiebreakerMatches?.toLocaleString()}</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Tiebreaker Matches</div>
-          </div>
-          <div className="glass-card" style={{ padding: '1rem', textAlign: 'center' }}>
-            <div className="stat-number" style={{ fontSize: '1.75rem' }}>{overview.sweepMatches}</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>6-0 Sweeps</div>
-          </div>
-          {/* Surface breakdown mini bars */}
-          <div className="glass-card" style={{ padding: '1rem', gridColumn: 'span 1' }}>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Matches by Surface</div>
-            {overview.bySurface?.map((s) => (
-              <div key={s._id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                <span style={{ fontSize: '0.7rem', color: surfaceColors[s._id] || '#94a3b8', width: '38px', fontWeight: 600 }}>{s._id}</span>
-                <div style={{ flex: 1, height: '4px', background: 'rgba(148,163,184,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
-                  <div style={{
-                    width: `${(s.count / overview.totalMatches) * 100}%`,
-                    height: '100%', background: surfaceColors[s._id] || '#64748b', borderRadius: '2px',
-                  }} />
-                </div>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', width: '40px', textAlign: 'right' }}>{s.count}</span>
-              </div>
-            ))}
-          </div>
+      <div className="animate-fade-up" style={{
+        display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+        gap: '0.75rem', marginBottom: '1.5rem', animationDelay: '0.05s',
+      }}>
+        <div className="glass-card" style={{ padding: '1rem', textAlign: 'center' }}>
+          <div className="stat-number" style={{ fontSize: '1.75rem' }}>{playerCount}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Players</div>
         </div>
-      )}
+        <div className="glass-card" style={{ padding: '1rem', textAlign: 'center' }}>
+          <div className="stat-number" style={{ fontSize: '1.75rem' }}>{matchCount.toLocaleString()}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Total Matches</div>
+        </div>
+        {/* Surface breakdown mini bars */}
+        <div className="glass-card" style={{ padding: '1rem', gridColumn: 'span 1' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Matches by Surface</div>
+          {surfaceStats.map((s) => (
+            <div key={s.surface} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+              <span style={{ fontSize: '0.7rem', color: surfaceColors[s.surface] || '#94a3b8', width: '38px', fontWeight: 600 }}>{s.surface}</span>
+              <div style={{ flex: 1, height: '4px', background: 'rgba(148,163,184,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                <div style={{
+                  width: `${matchCount > 0 ? (s.matchCount / matchCount) * 100 : 0}%`,
+                  height: '100%', background: surfaceColors[s.surface] || '#64748b', borderRadius: '2px',
+                }} />
+              </div>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', width: '40px', textAlign: 'right' }}>{s.matchCount}</span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Add Player Form */}
       <div className="glass-card animate-fade-up" style={{ padding: '1.5rem', marginBottom: '1.25rem', animationDelay: '0.1s' }}>

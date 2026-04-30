@@ -45,9 +45,6 @@ export default function Navbar() {
           <NavLink to="/tournaments" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             Tournaments
           </NavLink>
-          <NavLink to="/rivalries" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            Rivalries
-          </NavLink>
           <NavLink to="/match-explorer" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             Explorer
           </NavLink>

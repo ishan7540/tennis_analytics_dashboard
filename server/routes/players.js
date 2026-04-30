@@ -5,6 +5,25 @@ const Player = require('../models/Player');
 const Match = require('../models/Match');
 
 // -------------------------------------------------------
+// Helper: Pretty-print MongoDB queries in the terminal
+// -------------------------------------------------------
+function logQuery(routeName, collection, operation, queryOrPipeline, resultCount) {
+  const divider = '═'.repeat(60);
+  const timestamp = new Date().toLocaleTimeString();
+  console.log(`\n\x1b[36m${divider}\x1b[0m`);
+  console.log(`\x1b[33m📡 [${timestamp}] API CALLED: ${routeName}\x1b[0m`);
+  console.log(`\x1b[36m${divider}\x1b[0m`);
+  console.log(`\x1b[32m   Collection : \x1b[0m${collection}`);
+  console.log(`\x1b[32m   Operation  : \x1b[0m${operation}`);
+  console.log(`\x1b[32m   Query      :\x1b[0m`);
+  console.log(`\x1b[37m${JSON.stringify(queryOrPipeline, null, 2)}\x1b[0m`);
+  if (resultCount !== undefined) {
+    console.log(`\x1b[32m   Results    : \x1b[0m\x1b[33m${resultCount} document(s)\x1b[0m`);
+  }
+  console.log(`\x1b[36m${divider}\x1b[0m\n`);
+}
+
+// -------------------------------------------------------
 // GET /api/players — Return all players
 // Supports: ?sort=rank|name|nationality  &order=asc|desc
 //           &hand=R|L  &nationality=ESP
@@ -61,6 +80,15 @@ router.get('/', async (req, res) => {
     if (limit) pipeline.push({ $limit: parseInt(limit, 10) });
 
     const players = await Player.aggregate(pipeline);
+
+    logQuery(
+      'GET /api/players',
+      'players',
+      'aggregate()',
+      pipeline,
+      players.length
+    );
+
     res.json({ players, totalCount });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -79,11 +107,18 @@ router.get('/search', async (req, res) => {
     }
 
     // $regex with $options: 'i' for case-insensitive search
-    const players = await Player.find({
-      name: { $regex: q, $options: 'i' },
-    })
+    const query = { name: { $regex: q, $options: 'i' } };
+    const players = await Player.find(query)
       .sort({ rank: 1 })
       .limit(20);
+
+    logQuery(
+      'GET /api/players/search',
+      'players',
+      'find() + sort() + limit(20)',
+      query,
+      players.length
+    );
 
     res.json(players);
   } catch (err) {
@@ -98,6 +133,15 @@ router.get('/search', async (req, res) => {
 router.get('/nationalities', async (req, res) => {
   try {
     const nationalities = await Player.distinct('nationality');
+
+    logQuery(
+      'GET /api/players/nationalities',
+      'players',
+      'distinct("nationality")',
+      { field: 'nationality' },
+      nationalities.length
+    );
+
     res.json(nationalities.sort());
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -111,6 +155,15 @@ router.get('/nationalities', async (req, res) => {
 router.get('/count', async (req, res) => {
   try {
     const count = await Player.countDocuments();
+
+    logQuery(
+      'GET /api/players/count',
+      'players',
+      'countDocuments()',
+      {},
+      count
+    );
+
     res.json({ count });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -124,7 +177,7 @@ router.get('/count', async (req, res) => {
 // -------------------------------------------------------
 router.get('/by-nationality', async (req, res) => {
   try {
-    const result = await Player.aggregate([
+    const pipeline = [
       {
         $group: {
           _id: '$nationality',
@@ -142,7 +195,18 @@ router.get('/by-nationality', async (req, res) => {
           _id: 0,
         },
       },
-    ]);
+    ];
+
+    const result = await Player.aggregate(pipeline);
+
+    logQuery(
+      'GET /api/players/by-nationality',
+      'players',
+      'aggregate()',
+      pipeline,
+      result.length
+    );
+
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -155,10 +219,21 @@ router.get('/by-nationality', async (req, res) => {
 // -------------------------------------------------------
 router.get('/hand-stats', async (req, res) => {
   try {
-    const stats = await Player.aggregate([
+    const pipeline = [
       { $group: { _id: '$hand', count: { $sum: 1 } } },
       { $sort: { count: -1 } },
-    ]);
+    ];
+
+    const stats = await Player.aggregate(pipeline);
+
+    logQuery(
+      'GET /api/players/hand-stats',
+      'players',
+      'aggregate()',
+      pipeline,
+      stats.length
+    );
+
     res.json(stats);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -172,11 +247,22 @@ router.get('/hand-stats', async (req, res) => {
 router.get('/top-countries', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit, 10) || 15;
-    const stats = await Player.aggregate([
+    const pipeline = [
       { $group: { _id: '$nationality', playerCount: { $sum: 1 } } },
       { $sort: { playerCount: -1 } },
       { $limit: limit },
-    ]);
+    ];
+
+    const stats = await Player.aggregate(pipeline);
+
+    logQuery(
+      'GET /api/players/top-countries',
+      'players',
+      'aggregate()',
+      pipeline,
+      stats.length
+    );
+
     res.json(stats);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -189,9 +275,19 @@ router.get('/top-countries', async (req, res) => {
 // -------------------------------------------------------
 router.get('/left-handed', async (req, res) => {
   try {
-    const players = await Player.find({ hand: 'L' })
+    const query = { hand: 'L' };
+    const players = await Player.find(query)
       .sort({ rank: 1 })
       .lean();
+
+    logQuery(
+      'GET /api/players/left-handed',
+      'players',
+      'find() + sort({ rank: 1 })',
+      query,
+      players.length
+    );
+
     res.json({ count: players.length, players });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -206,11 +302,20 @@ router.get('/rank-range', async (req, res) => {
   try {
     const min = parseInt(req.query.min, 10) || 1;
     const max = parseInt(req.query.max, 10) || 100;
-    const players = await Player.find({
-      rank: { $gte: min, $lte: max },
-    })
+    const query = { rank: { $gte: min, $lte: max } };
+
+    const players = await Player.find(query)
       .sort({ rank: 1 })
       .lean();
+
+    logQuery(
+      'GET /api/players/rank-range',
+      'players',
+      'find() + sort({ rank: 1 })',
+      query,
+      players.length
+    );
+
     res.json({ count: players.length, players });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -227,7 +332,17 @@ router.post('/', async (req, res) => {
     if (!name || !nationality) {
       return res.status(400).json({ error: 'Name and nationality are required' });
     }
-    const player = await Player.create({ name, nationality, rank, hand });
+    const doc = { name, nationality, rank, hand };
+    const player = await Player.create(doc);
+
+    logQuery(
+      'POST /api/players',
+      'players',
+      'create()',
+      doc,
+      1
+    );
+
     res.status(201).json(player);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -240,8 +355,18 @@ router.post('/', async (req, res) => {
 // -------------------------------------------------------
 router.get('/:id', async (req, res) => {
   try {
+    const query = { _id: req.params.id };
     const player = await Player.findById(req.params.id);
     if (!player) return res.status(404).json({ error: 'Player not found' });
+
+    logQuery(
+      'GET /api/players/:id',
+      'players',
+      'findById()',
+      query,
+      player ? 1 : 0
+    );
+
     res.json(player);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -254,11 +379,21 @@ router.get('/:id', async (req, res) => {
 // -------------------------------------------------------
 router.put('/:id', async (req, res) => {
   try {
+    const query = { _id: req.params.id, update: req.body };
     const player = await Player.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
     if (!player) return res.status(404).json({ error: 'Player not found' });
+
+    logQuery(
+      'PUT /api/players/:id',
+      'players',
+      'findByIdAndUpdate()',
+      query,
+      player ? 1 : 0
+    );
+
     res.json(player);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -271,8 +406,18 @@ router.put('/:id', async (req, res) => {
 // -------------------------------------------------------
 router.delete('/:id', async (req, res) => {
   try {
+    const query = { _id: req.params.id };
     const player = await Player.findByIdAndDelete(req.params.id);
     if (!player) return res.status(404).json({ error: 'Player not found' });
+
+    logQuery(
+      'DELETE /api/players/:id',
+      'players',
+      'findByIdAndDelete()',
+      query,
+      1
+    );
+
     res.json({ message: 'Player deleted', player });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -288,20 +433,38 @@ router.get('/:id/stats', async (req, res) => {
     const playerId = new mongoose.Types.ObjectId(req.params.id);
 
     // 1) Count wins per surface
-    const wins = await Match.aggregate([
+    const winsPipeline = [
       { $match: { winner_id: playerId } },
       { $group: { _id: '$surface', wins: { $sum: 1 } } },
-    ]);
+    ];
+    const wins = await Match.aggregate(winsPipeline);
+
+    logQuery(
+      'GET /api/players/:id/stats (wins)',
+      'matches',
+      'aggregate()',
+      winsPipeline,
+      wins.length
+    );
 
     // 2) Count total matches (win OR loss) per surface — uses $or
-    const totals = await Match.aggregate([
+    const totalsPipeline = [
       {
         $match: {
           $or: [{ winner_id: playerId }, { loser_id: playerId }],
         },
       },
       { $group: { _id: '$surface', total: { $sum: 1 } } },
-    ]);
+    ];
+    const totals = await Match.aggregate(totalsPipeline);
+
+    logQuery(
+      'GET /api/players/:id/stats (totals)',
+      'matches',
+      'aggregate()',
+      totalsPipeline,
+      totals.length
+    );
 
     // 3) Merge into a single result
     const totalMap = {};
@@ -345,14 +508,24 @@ router.get('/:id/matches', async (req, res) => {
     const limit = parseInt(req.query.limit, 10) || 50;
 
     // Uses $or to find matches where player is winner OR loser
-    const matches = await Match.find({
+    const query = {
       $or: [{ winner_id: playerId }, { loser_id: playerId }],
-    })
+    };
+
+    const matches = await Match.find(query)
       .populate('winner_id', 'name nationality')
       .populate('loser_id', 'name nationality')
       .sort({ createdAt: -1 })
       .limit(limit)
       .lean();
+
+    logQuery(
+      'GET /api/players/:id/matches',
+      'matches',
+      `find() + populate() + sort() + limit(${limit})`,
+      query,
+      matches.length
+    );
 
     res.json({ count: matches.length, matches });
   } catch (err) {
