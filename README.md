@@ -280,13 +280,5 @@ Each log shows:
 | `GET` | `/api/matches/dominant-wins` | Every set won 6-0 or 6-1 |
 | `GET` | `/api/matches/filter?surface=&tournament=` | Filter matches |
 
----
 
-## ⚙️ Environment Variables
 
-The server uses a `.env` file in the `server/` directory:
-
-```env
-MONGO_URI=mongodb://localhost:27017/tennis_analytics
-PORT=5001
-```
